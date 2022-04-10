@@ -1,3 +1,4 @@
+'use strict';
 function Transform(location = new Vector3([0, 0, 0]), rotation = new Vector3([0, 0, 0]), scale = new Vector3([1, 1, 1]))
 {
     this.location = location;
@@ -29,6 +30,8 @@ class Mesh extends Actor
         this.material = material;
         this.bCastShadow = bCastShadow;
         this.mMatrix = new Matrix4();
+
+        // this.loadOverEvent = new CustomEvent('loadover');
     }
 
     /**
@@ -39,17 +42,27 @@ class Mesh extends Actor
         this.mMatrix.setTranslate(this.transform.location[0], this.transform.location[1], this.transform.location[2]).
             rotate(this.transform.rotation[0], 1, 0, 0).rotate(this.transform.rotation[1], 0, 1, 0).rotate(this.transform.rotation[2], 0, 0, 1).
             scale(this.transform.scale[0], this.transform.scale[1], this.transform.scale[2]);
-    };
+    }
+
+    loadMesh()
+    {
+        setTimeout(this.loadOver, 1000);
+    }
+
+    loadOver()
+    {
+        console.log
+    }
 }
 
 class Light extends Actor
 {
     /**
      * 
-     * @param {*} transform 变换 
-     * @param {*} lightColor 灯光颜色
-     * @param {*} intensity 强度
-     * @param {*} lightType 灯光类型
+     * @param {Transform} transform 变换 
+     * @param {Vector3} lightColor 灯光颜色
+     * @param {Number} intensity 强度
+     * @param {LIGHT_TYPE} lightType 灯光类型
      */
     constructor(transform, lightColor, intensity, lightType = LIGHT_TYPE.DIRECTIONAL)
     {

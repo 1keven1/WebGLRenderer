@@ -17,47 +17,68 @@ class WebGLRenderer
     constructor(scene)
     {
         this.scene = scene;
+
+        this.meshLoadedNum = 0;
+        this.textureLodedNum = 0;
     }
 
-    startRender()
+    start()
     {
         this.loadScene();
         this.customBeginPlay();
 
-        let renderLoop = () =>
-        {
-            console.log(scene);
-            this.customTick();
-            this.calculateMatrices();
-            this.render;
-            // requestAnimationFrame(renderLoop);
-        }
-        renderLoop();
     }
 
     loadScene()
     {
-        // console.log(scene);
+        console.log('loading scene');
         // 加载MeshList
         this.scene.meshList.forEach((mesh, index, arr) =>
         {
-            // console.log(mesh);
-            // 加载OBJ模型 并解析
-
-            // 加载shader 并编译 初始化shader变量
-
+            console.log('loading mesh');
+            // 加载Mesh的Obj模型和shader
+            mesh.loadOver = this.meshLoadOver.bind(this);
+            mesh.loadMesh();
         });
 
         // 加载贴图
         this.scene.textureList.forEach((texture, index, arr) =>
         {
             console.log(texture);
+            texture.loadTexture();
         })
+    }
+
+    meshLoadOver()
+    {
+        console.log('mesh load over');
+        this.meshLoadedNum++;
+        if (this.meshLoadedNum === this.scene.meshList.length && this.textureLodedNum === this.scene.textureList.length)
+            this.startRenderLoop();
+    }
+
+    textureLoadOver()
+    {
+        this.textureLodedNum++;
+        if (this.meshLoadedNum === this.scene.meshList.length && this.textureLodedNum === this.scene.textureList.length)
+        this.startRenderLoop();
     }
 
     customBeginPlay()
     {
 
+    }
+
+    startRenderLoop()
+    {
+        let renderLoop = () =>
+        {
+            this.customTick();
+            this.calculateMatrices();
+            this.render();
+            // requestAnimationFrame(renderLoop);
+        }
+        renderLoop();
     }
 
     customTick()

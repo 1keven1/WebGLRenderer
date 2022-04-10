@@ -23,4 +23,4 @@ renderer.customTick = function ()
 {
     
 }
-renderer.startRender();
+renderer.start();

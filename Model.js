@@ -11,6 +11,8 @@ class Model
         this.normalBuffer = null;
         this.indexBuffer = null;
         this.indexNum = -1;
+
+        this.bLoad = false;
     }
 
     readOBJFile()
