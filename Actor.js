@@ -23,6 +23,13 @@ class Actor
 
 class Mesh extends Actor
 {
+    /**
+     * 
+     * @param {Transform} transform 
+     * @param {Model} model 
+     * @param {material} material 
+     * @param {Boolean} bCastShadow 
+     */
     constructor(transform, model, material, bCastShadow = true)
     {
         super(transform);
@@ -31,7 +38,8 @@ class Mesh extends Actor
         this.bCastShadow = bCastShadow;
         this.mMatrix = new Matrix4();
 
-        // this.loadOverEvent = new CustomEvent('loadover');
+        this.bModelLoaded = false;
+        this.bShaderLoaded = false;
     }
 
     /**
@@ -46,13 +54,27 @@ class Mesh extends Actor
 
     loadMesh()
     {
-        setTimeout(this.loadOver, 1000);
+        // 加载Obj模型
+        this.model.loadOver = this.modelLoadOver.bind(this);
+        this.model.load();
+
+        // 加载Shader
+        
     }
 
-    loadOver()
+    modelLoadOver()
     {
-        console.log
+        this.bModelLoaded = true;
+        if (this.bModelLoaded && this.bShaderLoaded) this.loadOver();
     }
+
+    shaderLoadOver()
+    {
+        this.bShaderLoaded = true;
+        if (this.bModelLoaded && this.bShaderLoaded) this.loadOver();
+    }
+
+    loadOver() {}
 }
 
 class Light extends Actor

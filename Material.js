@@ -15,6 +15,12 @@ Object.freeze(MATERIAL_TYPE);
 
 class Material
 {
+    /**
+     * 
+     * @param {Shader} baseShader 
+     * @param {MATERIAL_TYPE} materialType 
+     * @param {Number} queueOffset 
+     */
     constructor(baseShader, materialType=MATERIAL_TYPE.OPAQUE, queueOffset=0)
     {
         this.baseShader = baseShader;
@@ -75,7 +81,7 @@ class Material
                 this.bBlend = false;
                 this.srcFactor = gl.SRC_ALPHA;
                 this.desFactor = gl.ONE_MINUS_SRC_ALPHA;
-                this.renderQueue = 1000 + Offset;
+                this.renderQueue = 1000 + offset;
                 break;
             case MATERIAL_TYPE.MASKED:
                 this.bDepthTest = true;
@@ -83,7 +89,7 @@ class Material
                 this.bBlend = false;
                 this.srcFactor = gl.SRC_ALPHA;
                 this.desFactor = gl.ONE_MINUS_SRC_ALPHA;
-                this.renderQueue = 1500 + Offset;
+                this.renderQueue = 1500 + offset;
                 break;
             case MATERIAL_TYPE.TRANSLUCENT:
                 this.bDepthTest = false;
@@ -91,7 +97,7 @@ class Material
                 this.bBlend = true;
                 this.srcFactor = gl.SRC_ALPHA;
                 this.desFactor = gl.ONE_MINUS_SRC_ALPHA;
-                this.renderQueue = 2000 + Offset;
+                this.renderQueue = 2000 + offset;
                 break;
             case MATERIAL_TYPE.ADDITIVE:
                 this.bDepthTest = false;
@@ -99,7 +105,7 @@ class Material
                 this.bBlend = true;
                 this.srcFactor = gl.ONE;
                 this.desFactor = gl.ONE;
-                this.renderQueue = 2000 + Offset;
+                this.renderQueue = 2000 + offset;
                 break;
             default:
                 this.bDepthTest = true;
@@ -107,7 +113,7 @@ class Material
                 this.bBlend = false;
                 this.srcFactor = gl.SRC_ALPHA;
                 this.desFactor = gl.ONE_MINUS_SRC_ALPHA;
-                this.renderQueue = 1000 + Offset;
+                this.renderQueue = 1000 + offset;
                 console.error('材质类型不存在：' + materialType);
                 break;
         }
@@ -117,5 +123,17 @@ class Material
     {
         this.srcFactor = srcFactor;
         this.desFactor = desFactor;
+    }
+
+    loadShader()
+    {
+        // 加载Base Shader
+        this.baseShader.loadOver = this.shaderLoadOver.bind(this);
+        this.baseShader.load();
+    }
+
+    shaderLoadOver()
+    {
+        
     }
 }

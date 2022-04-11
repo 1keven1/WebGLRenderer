@@ -14,6 +14,10 @@ let height = canvas.height;
 
 class WebGLRenderer
 {
+    /**
+     * 
+     * @param {Scene} scene 
+     */
     constructor(scene)
     {
         this.scene = scene;
@@ -36,7 +40,6 @@ class WebGLRenderer
         this.scene.meshList.forEach((mesh, index, arr) =>
         {
             console.log('loading mesh');
-            // 加载Mesh的Obj模型和shader
             mesh.loadOver = this.meshLoadOver.bind(this);
             mesh.loadMesh();
         });
@@ -45,6 +48,7 @@ class WebGLRenderer
         this.scene.textureList.forEach((texture, index, arr) =>
         {
             console.log(texture);
+            texture.loadOver = this.textureLoadOver.bind(this);
             texture.loadTexture();
         })
     }
@@ -59,6 +63,7 @@ class WebGLRenderer
 
     textureLoadOver()
     {
+        console.log('texture load over');
         this.textureLodedNum++;
         if (this.meshLoadedNum === this.scene.meshList.length && this.textureLodedNum === this.scene.textureList.length)
         this.startRenderLoop();

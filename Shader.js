@@ -19,6 +19,13 @@ class Shader
         // this.shaderProgram.u_Matrix_Light = null;
     }
 
+    load()
+    {
+        
+    }
+
+    loadOver() {}
+
     readShaderFile()
     {
         

@@ -1,6 +1,13 @@
 'use strict';
 class Scene
 {
+    /**
+     * 
+     * @param {Mesh[]} meshList 
+     * @param {Light[]} lightList 
+     * @param {Camera} camera 
+     * @param {Texture[]} textureList 
+     */
     constructor(meshList, lightList, camera, textureList)
     {
         this.meshList = meshList;
