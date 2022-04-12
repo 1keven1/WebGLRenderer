@@ -8,13 +8,10 @@ class Texture
         this.texType = texType;
     }
 
-    loadTexture()
+    load()
     {
-        
+
     }
 
-    loadOver()
-    {
-        
-    }
+    loadOver() { }
 }

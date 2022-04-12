@@ -21,54 +21,20 @@ class Material
      * @param {MATERIAL_TYPE} materialType 
      * @param {Number} queueOffset 
      */
-    constructor(baseShader, materialType=MATERIAL_TYPE.OPAQUE, queueOffset=0)
+    constructor(baseShader, materialType = MATERIAL_TYPE.OPAQUE, queueOffset = 0)
     {
         this.baseShader = baseShader;
 
-        switch (materialType)
-        {
-            case MATERIAL_TYPE.OPAQUE:
-                this.bDepthTest = true;
-                this.bCull = true;
-                this.bBlend = false;
-                this.srcFactor = gl.SRC_ALPHA;
-                this.desFactor = gl.ONE_MINUS_SRC_ALPHA;
-                this.renderQueue = 1000 + queueOffset;
-                break;
-            case MATERIAL_TYPE.MASKED:
-                this.bDepthTest = true;
-                this.bCull = true;
-                this.bBlend = false;
-                this.srcFactor = gl.SRC_ALPHA;
-                this.desFactor = gl.ONE_MINUS_SRC_ALPHA;
-                this.renderQueue = 1500 + queueOffset;
-                break;
-            case MATERIAL_TYPE.TRANSLUCENT:
-                this.bDepthTest = false;
-                this.bCull = true;
-                this.bBlend = true;
-                this.srcFactor = gl.SRC_ALPHA;
-                this.desFactor = gl.ONE_MINUS_SRC_ALPHA;
-                this.renderQueue = 2000 + queueOffset;
-                break;
-            case MATERIAL_TYPE.ADDITIVE:
-                this.bDepthTest = false;
-                this.bCull = true;
-                this.bBlend = true;
-                this.srcFactor = gl.ONE;
-                this.desFactor = gl.ONE;
-                this.renderQueue = 2000 + queueOffset;
-                break;
-            default:
-                this.bDepthTest = true;
-                this.bCull = true;
-                this.bBlend = false;
-                this.srcFactor = gl.SRC_ALPHA;
-                this.desFactor = gl.ONE_MINUS_SRC_ALPHA;
-                this.renderQueue = 1000 + queueOffset;
-                console.error('材质类型不存在：' + materialType);
-                break;
-        }
+        this.setMaterialType(materialType, queueOffset);
+
+        this.a_Position = -1;
+        this.a_TexCoord = -1;
+        this.a_Normal = -1;
+        this.u_Matrix_MVP = null;
+        this.u_Matrix_M_I = null;
+        this.u_LightPos = null;
+        this.u_LightColor = null;
+        this.u_Matrix_Light = null;
     }
 
     setMaterialType(materialType, offset)
@@ -125,6 +91,13 @@ class Material
         this.desFactor = desFactor;
     }
 
+    load()
+    {
+        this.loadShader();
+    }
+
+    loadOver() { }
+
     loadShader()
     {
         // 加载Base Shader
@@ -134,6 +107,23 @@ class Material
 
     shaderLoadOver()
     {
-        
+        // 初始化必要Shader变量
+        this.a_Position = gl.getAttribLocation(this.baseShader.program, 'a_Position');
+        this.a_TexCoord = gl.getAttribLocation(this.baseShader.program, 'a_TexCoord');
+        this.a_Normal = gl.getAttribLocation(this.baseShader.program, 'a_Normal');
+
+        this.u_Matrix_MVP = gl.getUniformLocation(this.baseShader.program, 'u_Matrix_MVP');
+        this.u_Matrix_M_I = gl.getUniformLocation(this.baseShader.program, 'u_Matrix_M_I');
+        this.u_LightPos = gl.getUniformLocation(this.baseShader.program, 'u_LightPos');
+        this.u_LightColor = gl.getUniformLocation(this.baseShader.program, 'u_LightColor');
+        this.u_Matrix_Light = gl.getUniformLocation(this.baseShader.program, 'u_Matrix_Light');
+        // this.u_ShadowMap = gl.getUniformLocation(this.baseShader.program, 'u_ShadowMap');
+
+        this.loadOver();
+    }
+
+    getProgram()
+    {
+        return this.baseShader.program;
     }
 }

@@ -30,5 +30,5 @@ void main()
     vec3 ambient = u_AmbientColor * albedo;
 
     vec3 finalColor = diffuse + ambient;
-    gl_FragColor = vec4(finalColor, 1.0);
+    gl_FragColor = vec4(finalColor, 1);
 }

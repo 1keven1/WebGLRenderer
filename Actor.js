@@ -27,7 +27,7 @@ class Mesh extends Actor
      * 
      * @param {Transform} transform 
      * @param {Model} model 
-     * @param {material} material 
+     * @param {Material} material 
      * @param {Boolean} bCastShadow 
      */
     constructor(transform, model, material, bCastShadow = true)
@@ -37,6 +37,7 @@ class Mesh extends Actor
         this.material = material;
         this.bCastShadow = bCastShadow;
         this.mMatrix = new Matrix4();
+        this.mIMatrix = new Matrix4();
 
         this.bModelLoaded = false;
         this.bShaderLoaded = false;
@@ -47,9 +48,10 @@ class Mesh extends Actor
      */
     bulidMMatrix()
     {
-        this.mMatrix.setTranslate(this.transform.location[0], this.transform.location[1], this.transform.location[2]).
-            rotate(this.transform.rotation[0], 1, 0, 0).rotate(this.transform.rotation[1], 0, 1, 0).rotate(this.transform.rotation[2], 0, 0, 1).
-            scale(this.transform.scale[0], this.transform.scale[1], this.transform.scale[2]);
+        this.mMatrix.setTranslate(this.transform.location.x(), this.transform.location.y(), this.transform.location.z()).
+            rotate(this.transform.rotation.x(), 1, 0, 0).rotate(this.transform.rotation.y(), 0, 1, 0).rotate(this.transform.rotation.z(), 0, 0, 1).
+            scale(this.transform.scale.x(), this.transform.scale.y(), this.transform.scale.z());
+        this.mIMatrix.setInverseOf(this.mMatrix);
     }
 
     loadMesh()
@@ -59,7 +61,8 @@ class Mesh extends Actor
         this.model.load();
 
         // 加载Shader
-        
+        this.material.loadOver = this.shaderLoadOver.bind(this);
+        this.material.load();
     }
 
     modelLoadOver()
@@ -74,7 +77,7 @@ class Mesh extends Actor
         if (this.bModelLoaded && this.bShaderLoaded) this.loadOver();
     }
 
-    loadOver() {}
+    loadOver() { }
 }
 
 class Light extends Actor
@@ -101,21 +104,27 @@ class Light extends Actor
         switch (this.lightType)
         {
             case LIGHT_TYPE.DIRECTIONAL:
-                console.log('ok');
+                let rotateMatrix = new Matrix4().setRotate(this.transform.rotation.x(), 1, 0, 0).rotate(this.transform.rotation.y(), 0, 1, 0).rotate(this.transform.rotation.z(), 0, 0, 1);
+                let lookVec = rotateMatrix.multiplyVector3(new Vector3([0, 0, -1]));
+                let upVec = rotateMatrix.multiplyVector3(new Vector3([0, 1, 0]));
+
+                this.vpMatrix.setOrtho(-7, 7, -7, 7, 1, 100).
+                    lookAt(this.transform.location.x(), this.transform.location.y(), this.transform.location.z(),
+                    lookVec.x() + this.transform.location.x(), lookVec.y() + this.transform.location.y(), lookVec.z() + this.transform.location.z(),
+                    upVec.x(), upVec.y(), upVec.z());
                 break;
             case LIGHT_TYPE.POINT:
                 break;
             case LIGHT_TYPE.SPOT:
                 break;
             default:
-                console.log('not ok');
                 break;
         }
     }
-    
+
     initShadowMap()
     {
-        
+
     }
 }
 
@@ -133,14 +142,14 @@ class Camera extends Actor
 
     bulidVPMatrix()
     {
-        let rotateMatrix = new Matrix4().setRotate(this.transform.rotation[0], 1, 0, 0).rotate(this.transform.rotation[1], 0, 1, 0).rotate(this.transform.rotation[2], 0, 0, 1);
+        let rotateMatrix = new Matrix4().setRotate(this.transform.rotation.x(), 1, 0, 0).rotate(this.transform.rotation.y(), 0, 1, 0).rotate(this.transform.rotation.z(), 0, 0, 1);
         let lookVec = rotateMatrix.multiplyVector3(new Vector3([0, 0, -1]));
-        let upVec = rotateMatrix.multiplyVector3(new Vector3[0, 1, 0]);
+        let upVec = rotateMatrix.multiplyVector3(new Vector3([0, 1, 0]));
 
         this.vpMatrix.setPerspective(this.FOV, width / height, this.nearClip, this.farClip).
             lookAt(
-                this.transform.location[0], this.transform.location[1], this.transform.location[2],
-                lookVec[0] + this.transform.location[0], lookVec[1] + this.transform.location[1], lookVec[2] + this.transform.location[2],
-                upVec[0], upVec[1], upVec[2]);
+                this.transform.location.x(), this.transform.location.y(), this.transform.location.z(),
+                lookVec.x() + this.transform.location.x(), lookVec.y() + this.transform.location.y(), lookVec.z() + this.transform.location.z(),
+                upVec.x(), upVec.y(), upVec.z());
     }
 }

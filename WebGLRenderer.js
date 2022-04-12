@@ -22,82 +22,39 @@ class WebGLRenderer
     {
         this.scene = scene;
 
-        this.meshLoadedNum = 0;
-        this.textureLodedNum = 0;
+        gl.clearColor(0, 0, 0, 1);
     }
 
     start()
     {
-        this.loadScene();
-        this.customBeginPlay();
+        // 加载场景
+        this.scene.loadOver = this.startRenderLoop.bind(this);
+        this.scene.load()
 
-    }
-
-    loadScene()
-    {
-        console.log('loading scene');
-        // 加载MeshList
-        this.scene.meshList.forEach((mesh, index, arr) =>
-        {
-            console.log('loading mesh');
-            mesh.loadOver = this.meshLoadOver.bind(this);
-            mesh.loadMesh();
-        });
-
-        // 加载贴图
-        this.scene.textureList.forEach((texture, index, arr) =>
-        {
-            console.log(texture);
-            texture.loadOver = this.textureLoadOver.bind(this);
-            texture.loadTexture();
-        })
-    }
-
-    meshLoadOver()
-    {
-        console.log('mesh load over');
-        this.meshLoadedNum++;
-        if (this.meshLoadedNum === this.scene.meshList.length && this.textureLodedNum === this.scene.textureList.length)
-            this.startRenderLoop();
-    }
-
-    textureLoadOver()
-    {
-        console.log('texture load over');
-        this.textureLodedNum++;
-        if (this.meshLoadedNum === this.scene.meshList.length && this.textureLodedNum === this.scene.textureList.length)
-        this.startRenderLoop();
+        
     }
 
     customBeginPlay()
     {
-
+        console.warn('未重写Custom Begin Play');
     }
 
     startRenderLoop()
     {
+        this.customBeginPlay();
+        
         let renderLoop = () =>
         {
             this.customTick();
-            this.calculateMatrices();
-            this.render();
-            // requestAnimationFrame(renderLoop);
+            this.scene.calculateMatrices();
+            this.scene.render();
+            requestAnimationFrame(renderLoop);
         }
         renderLoop();
     }
 
     customTick()
     {
-        console.log('custom tick');
-    }
-
-    calculateMatrices()
-    {
-
-    }
-
-    render()
-    {
-        console.log('render');
+        console.warn('未重写Custom Tick');
     }
 }
