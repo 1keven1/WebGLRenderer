@@ -35,6 +35,8 @@ class Material
         this.u_LightPos = null;
         this.u_LightColor = null;
         this.u_Matrix_Light = null;
+
+        this.bLoaded = false;
     }
 
     setMaterialType(materialType, offset)
@@ -93,6 +95,7 @@ class Material
 
     load()
     {
+        this.bLoaded = true;
         this.loadShader();
     }
 
@@ -125,5 +128,49 @@ class Material
     getProgram()
     {
         return this.baseShader.program;
+    }
+
+    /**
+     * 
+     * @param {String} param 
+     * @param {Number} x 
+     * @param {Number} y 
+     * @param {Number} z 
+     */
+    setUniformVector3f(param, x = 0.0, y = 0.0, z = 0.0)
+    {
+        gl.useProgram(this.getProgram());
+        let u_Param = gl.getUniformLocation(this.getProgram(), param);
+        gl.uniform3f(u_Param, x, y, z);
+        gl.useProgram(null);
+    }
+
+    /**
+     * 
+     * @param {String} param 
+     * @param {Number} x 
+     * @param {Number} y 
+     * @param {Number} z 
+     * @param {Number} w 
+     */
+    setUniformVector4f(param, x = 0.0, y = 0.0, z = 0.0, w = 1.0)
+    {
+        gl.useProgram(this.getProgram());
+        let u_Param = gl.getUniformLocation(this.getProgram(), param);
+        gl.uniform4f(u_Param, x, y, z, w);
+        gl.useProgram(null);
+    }
+
+    /**
+     * 
+     * @param {String} param 
+     * @param {Number} texUnitNum 
+     */
+    setTexture(param, texUnitNum)
+    {
+        gl.useProgram(this.getProgram());
+        let u_Param = gl.getUniformLocation(this.getProgram(), param);
+        gl.uniform1i(u_Param, texUnitNum);
+        gl.useProgram(null);
     }
 }

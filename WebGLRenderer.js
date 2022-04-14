@@ -29,9 +29,7 @@ class WebGLRenderer
     {
         // 加载场景
         this.scene.loadOver = this.startRenderLoop.bind(this);
-        this.scene.load()
-
-        
+        this.scene.load();
     }
 
     customBeginPlay()
@@ -43,17 +41,26 @@ class WebGLRenderer
     {
         this.customBeginPlay();
         
-        let renderLoop = () =>
+        let lastTime = 0;
+        let deltaSecond = 0;
+        let renderLoop = (timeStamp) =>
         {
-            this.customTick();
+            deltaSecond = (timeStamp - lastTime) * 0.01;
+            lastTime = timeStamp;
+
+            this.customTick(deltaSecond);
             this.scene.calculateMatrices();
             this.scene.render();
             requestAnimationFrame(renderLoop);
         }
-        renderLoop();
+        renderLoop(0);
     }
 
-    customTick()
+    /**
+     * 
+     * @param {Number} deltaSecond 
+     */
+    customTick(deltaSecond)
     {
         console.warn('未重写Custom Tick');
     }

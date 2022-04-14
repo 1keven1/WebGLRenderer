@@ -86,7 +86,6 @@ class Scene
                 this.drawMesh(mesh, light);
             })
         })
-        console.log('render');
     }
 
     /**
@@ -108,8 +107,8 @@ class Scene
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.model.indexBuffer);
 
         // 传入默认变量
-        if (mesh.material.u_LightPos) gl.uniform4fv(mesh.material.u_LightPos, [10.0, 10.0, 10.0, 1.0]);
-        if (mesh.material.u_LightColor) gl.uniform4fv(mesh.material.u_LightColor, [1.0, 1.0, 1.0, 1.0]);
+        if (mesh.material.u_LightPos) gl.uniform4f(mesh.material.u_LightPos, light.getLocation().x(), light.getLocation().y(), light.getLocation().z(), light.w);
+        if (mesh.material.u_LightColor) gl.uniform4f(mesh.material.u_LightColor, light.lightColor.x(), light.lightColor.y(), light.lightColor.z(), 1);
 
         let mvpMatrix = new Matrix4().set(camera.vpMatrix).multiply(mesh.mMatrix);
         gl.uniformMatrix4fv(mesh.material.u_Matrix_MVP, false, mvpMatrix.elements);

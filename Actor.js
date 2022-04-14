@@ -15,9 +15,59 @@ Object.freeze(LIGHT_TYPE);
 
 class Actor
 {
+    /**
+     * 
+     * @param {Transform} transform 
+     */
     constructor(transform = new Transform())
     {
         this.transform = transform;
+    }
+
+    getLocation()
+    {
+        return this.transform.location.copy();
+    }
+
+    getRotation()
+    {
+        return this.transform.rotation.copy();
+    }
+
+    getScale()
+    {
+        return this.transform.scale.copy();
+    }
+
+    setLocation(location)
+    {
+        this.transform.location = location;
+    }
+
+    setRotation(rotation)
+    {
+        this.transform.rotation = rotation;
+    }
+
+    setLocationAndRotation(location, rotation)
+    {
+        this.transform.location = location;
+        this.transform.rotation = rotation;
+    }
+
+    setScale(scale)
+    {
+        this.transform.scale = scale;
+    }
+
+    addLocationOffset(offset)
+    {
+        this.transform.location.add(offset);
+    }
+
+    addRotationOffset(offset)
+    {
+        this.transform.rotation.add(offset);
     }
 }
 
@@ -44,6 +94,17 @@ class Mesh extends Actor
     }
 
     /**
+     * 
+     * @param {Mesh} mesh 
+     */
+    copy()
+    {
+        let newMesh = new Mesh(this.transform.copy(), this.model, this.material, this.bCastShadow);
+
+        return newMesh;
+    }
+
+    /**
      * 构造M矩阵
      */
     bulidMMatrix()
@@ -57,12 +118,20 @@ class Mesh extends Actor
     loadMesh()
     {
         // 加载Obj模型
-        this.model.loadOver = this.modelLoadOver.bind(this);
-        this.model.load();
+        if (!this.model.bLoaded)
+        {
+            this.model.loadOver = this.modelLoadOver.bind(this);
+            this.model.load();
+        }
+        else this.modelLoadOver();
 
         // 加载Shader
-        this.material.loadOver = this.shaderLoadOver.bind(this);
-        this.material.load();
+        if (!this.material.bLoaded)
+        {
+            this.material.loadOver = this.shaderLoadOver.bind(this);
+            this.material.load();
+        }
+        else this.shaderLoadOver();
     }
 
     modelLoadOver()
@@ -97,6 +166,9 @@ class Light extends Actor
         this.lightType = lightType;
         this.vpMatrix = new Matrix4();
         this.shadowMap = null;
+
+        if (lightType === LIGHT_TYPE.DIRECTIONAL) this.w = 0;
+        else this.w = 1;
     }
 
     bulidVPMatrix()
@@ -110,8 +182,8 @@ class Light extends Actor
 
                 this.vpMatrix.setOrtho(-7, 7, -7, 7, 1, 100).
                     lookAt(this.transform.location.x(), this.transform.location.y(), this.transform.location.z(),
-                    lookVec.x() + this.transform.location.x(), lookVec.y() + this.transform.location.y(), lookVec.z() + this.transform.location.z(),
-                    upVec.x(), upVec.y(), upVec.z());
+                        lookVec.x() + this.transform.location.x(), lookVec.y() + this.transform.location.y(), lookVec.z() + this.transform.location.z(),
+                        upVec.x(), upVec.y(), upVec.z());
                 break;
             case LIGHT_TYPE.POINT:
                 break;

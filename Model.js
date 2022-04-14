@@ -46,10 +46,13 @@ class Model
         this.normalBuffer = null;
         this.indexBuffer = null;
         this.indexNum = -1;
+
+        this.bLoaded = false;
     }
 
     load()
     {
+        this.bLoaded = true;
         this.loadOBJFile()
     }
 
@@ -236,7 +239,7 @@ class Model
         this.texCoordBuffer = this.createModelBuffer(gl.ARRAY_BUFFER, texCoords, 2, gl.FLOAT, gl.STATIC_DRAW);
         this.normalBuffer = this.createModelBuffer(gl.ARRAY_BUFFER, normals, 3, gl.FLOAT, gl.STATIC_DRAW);
         this.indexBuffer = this.createModelBuffer(gl.ELEMENT_ARRAY_BUFFER, indices, 3, gl.UNSIGNED_SHORT, gl.STATIC_DRAW);
-        if (!model.vertexBuffer || !model.normalBuffer || !model.texCoordBuffer || !model.indexBuffer)
+        if (!cube.vertexBuffer || !cube.normalBuffer || !cube.texCoordBuffer || !cube.indexBuffer)
         {
             console.error(this.objFile + '：解码到buffer失败');
         }

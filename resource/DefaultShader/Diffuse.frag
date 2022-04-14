@@ -23,11 +23,12 @@ varying vec4 v_PositionFromLight;
 void main()
 {
     vec3 albedo = vec3(0.5, 0.5, 0.5);
+    
     vec3 worldNormal = normalize(v_WorldNormal);
     vec3 lightDir = normalize(u_LightPos.xyz);
     float nDotL = max(0.0, dot(worldNormal, lightDir));
     vec3 diffuse = albedo * nDotL * u_LightColor.xyz;
-    vec3 ambient = u_AmbientColor * albedo;
+    vec3 ambient = u_AmbientColor.xyz * albedo;
 
     vec3 finalColor = diffuse + ambient;
     gl_FragColor = vec4(finalColor, 1);
