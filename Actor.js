@@ -88,9 +88,6 @@ class Mesh extends Actor
         this.bCastShadow = bCastShadow;
         this.mMatrix = new Matrix4();
         this.mIMatrix = new Matrix4();
-
-        this.bModelLoaded = false;
-        this.bShaderLoaded = false;
     }
 
     /**
@@ -114,39 +111,6 @@ class Mesh extends Actor
             scale(this.transform.scale.x(), this.transform.scale.y(), this.transform.scale.z());
         this.mIMatrix.setInverseOf(this.mMatrix);
     }
-
-    loadMesh()
-    {
-        // 加载Obj模型
-        if (!this.model.bLoaded)
-        {
-            this.model.loadOver = this.modelLoadOver.bind(this);
-            this.model.load();
-        }
-        else this.modelLoadOver();
-
-        // 加载Shader
-        if (!this.material.bLoaded)
-        {
-            this.material.loadOver = this.shaderLoadOver.bind(this);
-            this.material.load();
-        }
-        else this.shaderLoadOver();
-    }
-
-    modelLoadOver()
-    {
-        this.bModelLoaded = true;
-        if (this.bModelLoaded && this.bShaderLoaded) this.loadOver();
-    }
-
-    shaderLoadOver()
-    {
-        this.bShaderLoaded = true;
-        if (this.bModelLoaded && this.bShaderLoaded) this.loadOver();
-    }
-
-    loadOver() { }
 }
 
 class Light extends Actor
@@ -169,6 +133,10 @@ class Light extends Actor
 
         if (lightType === LIGHT_TYPE.DIRECTIONAL) this.w = 0;
         else this.w = 1;
+
+        this.lightIndex = null;
+        this.shadowMapTexUnit = null;
+        this.shadowMapRes = 1024;
     }
 
     bulidVPMatrix()
@@ -194,9 +162,56 @@ class Light extends Actor
         }
     }
 
-    initShadowMap()
+    initShadowMap(lightIndex, startTexUnit)
     {
+        this.lightIndex = lightIndex;
+        this.shadowMapTexUnit = gl.TEXTURE0 + startTexUnit + lightIndex;
+        let texture, depthbuffer;
 
+        // 错误函数
+        var error = () =>
+        {
+            if (texture) gl.deleteTexture(texture);
+            if (depthbuffer) gl.deleteRenderbuffer(depthbuffer);
+            if (framebuffer) gl.deleteFramebuffer(framebuffer);
+            console.error('灯光Shadow Map加载失败');
+        }
+
+        // 创建贴图作为rgb通道
+        texture = gl.createTexture();
+        if (!texture) error();
+        
+        gl.activeTexture(this.shadowMapTexUnit);
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.shadowMapRes, this.shadowMapRes, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+
+        // 创建renderbuffer 作为深度通道
+        depthbuffer = gl.createRenderbuffer();
+        if (!depthbuffer) error();
+
+        gl.bindRenderbuffer(gl.RENDERBUFFER, depthbuffer);
+        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.shadowMapRes, this.shadowMapRes);
+
+        // 创建framebuffer
+        this.shadowMap = gl.createFramebuffer();
+        if (!this.shadowMap) error();
+
+        // 绑定贴图和renderbuffer到framebuffer
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.shadowMap);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthbuffer);
+
+        // 检查framebuffer是否完整
+        let e = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+        if (e !== gl.FRAMEBUFFER_COMPLETE)
+        {
+            console.log('Framebuffer不完整');
+            error();
+        }
+
+        gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 }
 

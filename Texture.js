@@ -7,17 +7,21 @@ class Texture
      * @param {any} texUnit 
      * @param {any} texType 
      */
-    constructor(texFile, texUnit, texType = gl.TEXTURE_2D)
+    constructor(texFile, texType = gl.TEXTURE_2D)
     {
         this.texFile = texFile;
-        this.texUnit = texUnit;
         this.texType = texType;
+
+        this.texIndex = null;
+        this.texUnit = null;
 
         this.texture = null;
     }
 
-    load()
+    load(texIndex)
     {
+        this.texIndex = texIndex;
+        this.texUnit = gl.TEXTURE0 + texIndex;
         // 创建Texture
         let texture = gl.createTexture();
         if (!texture)

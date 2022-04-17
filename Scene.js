@@ -3,58 +3,105 @@ class Scene
 {
     /**
      * 
+     * @param {Model[]} modelList 
+     * @param {Material[]} materialList 
+     * @param {Texture[]} textureList 
      * @param {Mesh[]} meshList 
      * @param {Light[]} lightList 
      * @param {Camera} camera 
-     * @param {Texture[]} textureList 
      */
-    constructor(meshList, lightList, camera, textureList)
+    constructor(modelList, materialList, textureList, meshList, lightList, camera)
     {
+        this.modelList = modelList;
+        this.materialList = materialList;
+        this.textureList = textureList;
         this.meshList = meshList;
         this.lightList = lightList;
         this.camera = camera;
-        this.textureList = textureList;
 
-        this.meshLoadedNum = 0;
+        this.modelLoadedNum = 0;
+        this.materialLoadedNum = 0;
         this.textureLodedNum = 0;
+        this.lightLoadedNum = 0;
     }
 
     load()
     {
         console.log('loading scene');
-        // 加载MeshList
-        this.meshList.forEach((mesh, index, arr) =>
+        // 加载Model
+        this.modelList.forEach((model, index, arr) =>
         {
-            console.log('loading mesh');
-            mesh.loadOver = this.meshLoadOver.bind(this);
-            mesh.loadMesh();
-        });
-
+            model.loadOver = this.modelLoadOver.bind(this);
+            model.load()
+        })
+        // 加载Material
+        this.materialList.forEach((material, index, arr) =>
+        {
+            material.loadOver = this.materialLoadOver.bind(this);
+            material.load();
+        })
         // 加载贴图
         this.textureList.forEach((texture, index, arr) =>
         {
-            console.log(texture);
             texture.loadOver = this.textureLoadOver.bind(this);
-            texture.load();
+            texture.load(index);
+        })
+
+        // 初始化灯光ShadowMap
+        this.lightList.forEach((light, index, arr) =>
+        {
+            light.initShadowMap(index, this.textureList.length);
+            this.lightLoadOver();
         })
     }
 
     loadOver() { }
 
-    meshLoadOver()
+    modelLoadOver()
     {
         console.log('mesh load over');
-        this.meshLoadedNum++;
-        if (this.meshLoadedNum === this.meshList.length && this.textureLodedNum === this.textureList.length)
-            this.loadOver();
+        this.modelLoadedNum++;
+        this.checkIfLoadOver();
+    }
+
+    materialLoadOver()
+    {
+        console.log('mesh load over');
+        this.materialLoadedNum++;
+        this.checkIfLoadOver();
     }
 
     textureLoadOver()
     {
         console.log('texture load over');
         this.textureLodedNum++;
-        if (this.meshLoadedNum === this.meshList.length && this.textureLodedNum === this.textureList.length)
+        this.checkIfLoadOver();
+    }
+
+    lightLoadOver()
+    {
+        this.lightLoadedNum++;
+        this.checkIfLoadOver();
+    }
+
+    checkIfLoadOver()
+    {
+        if (this.modelLoadedNum === this.modelList.length &&
+            this.materialLoadedNum === this.materialList.length &&
+            this.textureLodedNum === this.textureList.length &&
+            this.lightLoadedNum === this.lightList.length)
+        {
+            this.meshList.forEach((mesh, index, arr) =>
+            {
+                if (!mesh.model.bLoaded || !mesh.material.bLoaded)
+                {
+                    if (!mesh.model.bLoaded) console.warn(mesh.model.objFile + '：没有加载完整');
+                    if (!mesh.material.bLoaded) console.warn(mesh.material.baseShader.vShaderFile + '：没有加载');
+                    this.meshList.splice(index, 1);
+                }
+            })
             this.loadOver();
+        }
     }
 
     calculateMatrices()
@@ -75,6 +122,21 @@ class Scene
 
     render()
     {
+        // 绘制灯光ShadowMap
+        this.lightList.forEach((light, index, arr) =>
+        {
+            gl.bindFramebuffer(gl.FRAMEBUFFER, light.shadowMap);
+            gl.viewport(0, 0, light.shadowMapRes, light.shadowMapRes);
+            gl.clearColor(0.0, 0.0, 0.0, 1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+            this.meshList.forEach((mesh, index, arr) =>
+            {
+                
+            })
+        })
+        
+        // 绘制到屏幕
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.viewport(0, 0, width, height);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -83,7 +145,7 @@ class Scene
         {
             this.meshList.forEach((mesh, meshIndex, arr) =>
             {
-                this.drawMesh(mesh, light);
+                this.drawMesh(mesh, light, lightIndex);
             })
         })
     }
@@ -95,30 +157,35 @@ class Scene
      */
     drawMesh(mesh, light)
     {
-        gl.useProgram(mesh.material.getProgram());
+        // Base Shader进行渲染
+        if (light.lightIndex === 0)
+        {
+            gl.useProgram(mesh.material.getBaseProgram());
 
-        if (mesh.material.bDepthTest) gl.enable(gl.DEPTH_TEST);
-        else gl.disable(gl.DIPTH_TEST);
+            if (mesh.material.bDepthTest) gl.enable(gl.DEPTH_TEST);
+            else gl.disable(gl.DIPTH_TEST);
 
-        // 绑定Vertex Buffer
-        if (mesh.material.a_Position >= 0) this.bindAttributeToBuffer(mesh.material.a_Position, mesh.model.vertexBuffer);
-        if (mesh.material.a_TexCoord >= 0) this.bindAttributeToBuffer(mesh.material.a_TexCoord, mesh.model.texCoordBuffer);
-        if (mesh.material.a_Normal >= 0) this.bindAttributeToBuffer(mesh.material.a_Normal, mesh.model.normalBuffer);
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.model.indexBuffer);
+            // 绑定Vertex Buffer
+            if (mesh.material.baseShader.a_Position >= 0) this.bindAttributeToBuffer(mesh.material.baseShader.a_Position, mesh.model.vertexBuffer);
+            if (mesh.material.baseShader.a_TexCoord >= 0) this.bindAttributeToBuffer(mesh.material.baseShader.a_TexCoord, mesh.model.texCoordBuffer);
+            if (mesh.material.baseShader.a_Normal >= 0) this.bindAttributeToBuffer(mesh.material.baseShader.a_Normal, mesh.model.normalBuffer);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.model.indexBuffer);
 
-        // 传入默认变量
-        if (mesh.material.u_LightPos) gl.uniform4f(mesh.material.u_LightPos, light.getLocation().x(), light.getLocation().y(), light.getLocation().z(), light.w);
-        if (mesh.material.u_LightColor) gl.uniform4f(mesh.material.u_LightColor, light.lightColor.x(), light.lightColor.y(), light.lightColor.z(), 1);
+            // 传入默认变量
+            if (mesh.material.baseShader.u_LightPos) gl.uniform4f(mesh.material.baseShader.u_LightPos, light.getLocation().x(), light.getLocation().y(), light.getLocation().z(), light.w);
+            if (mesh.material.baseShader.u_LightColor) gl.uniform4f(mesh.material.baseShader.u_LightColor, light.lightColor.x(), light.lightColor.y(), light.lightColor.z(), 1);
 
-        let mvpMatrix = new Matrix4().set(camera.vpMatrix).multiply(mesh.mMatrix);
-        gl.uniformMatrix4fv(mesh.material.u_Matrix_MVP, false, mvpMatrix.elements);
-        gl.uniformMatrix4fv(mesh.material.u_Matrix_M_I, false, mesh.mIMatrix.elements);
+            let mvpMatrix = new Matrix4().set(camera.vpMatrix).multiply(mesh.mMatrix);
+            gl.uniformMatrix4fv(mesh.material.baseShader.u_Matrix_MVP, false, mvpMatrix.elements);
+            gl.uniformMatrix4fv(mesh.material.baseShader.u_Matrix_M_I, false, mesh.mIMatrix.elements);
 
-        let mvpMatrixLight = new Matrix4().set(light.vpMatrix).multiply(mesh.mMatrix);
-        if (mesh.material.u_Matrix_Light) gl.uniformMatrix4fv(mesh.material.u_Matrix_Light, false, mvpMatrixLight.elements);
+            let mvpMatrixLight = new Matrix4().set(light.vpMatrix).multiply(mesh.mMatrix);
+            if (mesh.material.baseShader.u_Matrix_Light) gl.uniformMatrix4fv(mesh.material.baseShader.u_Matrix_Light, false, mvpMatrixLight.elements);
 
-        // 绘制
-        gl.drawElements(gl.TRIANGLES, mesh.model.indexNum, mesh.model.indexBuffer.dataType, 0);
+            // 绘制
+            gl.drawElements(gl.TRIANGLES, mesh.model.indexNum, mesh.model.indexBuffer.dataType, 0);
+        }
+        else { }
     }
 
     bindAttributeToBuffer(a_attribute, buffer)

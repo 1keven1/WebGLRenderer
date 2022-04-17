@@ -18,23 +18,16 @@ class Material
     /**
      * 
      * @param {Shader} baseShader 
+     * @param {Shader} shadowCaster
      * @param {MATERIAL_TYPE} materialType 
      * @param {Number} queueOffset 
      */
-    constructor(baseShader, materialType = MATERIAL_TYPE.OPAQUE, queueOffset = 0)
+    constructor(baseShader, shadowCaster, materialType = MATERIAL_TYPE.OPAQUE, queueOffset = 0)
     {
         this.baseShader = baseShader;
+        this.shadowCaster = shadowCaster;
 
         this.setMaterialType(materialType, queueOffset);
-
-        this.a_Position = -1;
-        this.a_TexCoord = -1;
-        this.a_Normal = -1;
-        this.u_Matrix_MVP = null;
-        this.u_Matrix_M_I = null;
-        this.u_LightPos = null;
-        this.u_LightColor = null;
-        this.u_Matrix_Light = null;
 
         this.bLoaded = false;
     }
@@ -104,30 +97,53 @@ class Material
     loadShader()
     {
         // 加载Base Shader
-        this.baseShader.loadOver = this.shaderLoadOver.bind(this);
-        this.baseShader.load();
+        if (!this.baseShader.bLoaded)
+        {
+            this.baseShader.loadOver = this.shaderLoadOver.bind(this);
+            this.baseShader.load();
+        }
+        if (!this.shadowCaster.bLoaded)
+        {
+            this.shadowCaster.loadOver = this.shaderLoadOver.bind(this);
+            this.shadowCaster.load();
+        }
+        if (this.baseShader.bLoaded && this.shadowCaster.bLoaded)
+            this.shaderLoadOver();
     }
 
     shaderLoadOver()
     {
-        // 初始化必要Shader变量
-        this.a_Position = gl.getAttribLocation(this.baseShader.program, 'a_Position');
-        this.a_TexCoord = gl.getAttribLocation(this.baseShader.program, 'a_TexCoord');
-        this.a_Normal = gl.getAttribLocation(this.baseShader.program, 'a_Normal');
-
-        this.u_Matrix_MVP = gl.getUniformLocation(this.baseShader.program, 'u_Matrix_MVP');
-        this.u_Matrix_M_I = gl.getUniformLocation(this.baseShader.program, 'u_Matrix_M_I');
-        this.u_LightPos = gl.getUniformLocation(this.baseShader.program, 'u_LightPos');
-        this.u_LightColor = gl.getUniformLocation(this.baseShader.program, 'u_LightColor');
-        this.u_Matrix_Light = gl.getUniformLocation(this.baseShader.program, 'u_Matrix_Light');
-        // this.u_ShadowMap = gl.getUniformLocation(this.baseShader.program, 'u_ShadowMap');
-
-        this.loadOver();
+        if (this.baseShader.program && this.shadowCaster.program)
+        {
+            this.initShaderProperties(this.baseShader);
+            this.initShaderProperties(this.shadowCaster);
+            this.loadOver();
+        }
     }
 
-    getProgram()
+    initShaderProperties(shader)
+    {
+        // 初始化必要Shader变量
+        shader.a_Position = gl.getAttribLocation(shader.program, 'a_Position');
+        shader.a_TexCoord = gl.getAttribLocation(shader.program, 'a_TexCoord');
+        shader.a_Normal = gl.getAttribLocation(shader.program, 'a_Normal');
+
+        shader.u_Matrix_MVP = gl.getUniformLocation(shader.program, 'u_Matrix_MVP');
+        shader.u_Matrix_M_I = gl.getUniformLocation(shader.program, 'u_Matrix_M_I');
+        shader.u_LightPos = gl.getUniformLocation(shader.program, 'u_LightPos');
+        shader.u_LightColor = gl.getUniformLocation(shader.program, 'u_LightColor');
+        shader.u_Matrix_Light = gl.getUniformLocation(shader.program, 'u_Matrix_Light');
+        shader.u_ShadowMap = gl.getUniformLocation(shader.program, 'u_ShadowMap');
+    }
+
+    getBaseProgram()
     {
         return this.baseShader.program;
+    }
+
+    getShadowCasterProgram()
+    {
+        return this.shadowCaster.program;
     }
 
     /**
@@ -139,8 +155,8 @@ class Material
      */
     setUniformVector3f(param, x = 0.0, y = 0.0, z = 0.0)
     {
-        gl.useProgram(this.getProgram());
-        let u_Param = gl.getUniformLocation(this.getProgram(), param);
+        gl.useProgram(this.getBaseProgram());
+        let u_Param = gl.getUniformLocation(this.getBaseProgram(), param);
         gl.uniform3f(u_Param, x, y, z);
         gl.useProgram(null);
     }
@@ -155,8 +171,8 @@ class Material
      */
     setUniformVector4f(param, x = 0.0, y = 0.0, z = 0.0, w = 1.0)
     {
-        gl.useProgram(this.getProgram());
-        let u_Param = gl.getUniformLocation(this.getProgram(), param);
+        gl.useProgram(this.getBaseProgram());
+        let u_Param = gl.getUniformLocation(this.getBaseProgram(), param);
         gl.uniform4f(u_Param, x, y, z, w);
         gl.useProgram(null);
     }
@@ -168,8 +184,8 @@ class Material
      */
     setTexture(param, texUnitNum)
     {
-        gl.useProgram(this.getProgram());
-        let u_Param = gl.getUniformLocation(this.getProgram(), param);
+        gl.useProgram(this.getBaseProgram());
+        let u_Param = gl.getUniformLocation(this.getBaseProgram(), param);
         gl.uniform1i(u_Param, texUnitNum);
         gl.useProgram(null);
     }

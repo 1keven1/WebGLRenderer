@@ -13,10 +13,22 @@ class Shader
         this.vShaderSource = null;
         this.fShaderSource = null;
         this.program = null;
+        this.bLoaded = false;
+
+        
+        this.a_Position = -1;
+        this.a_TexCoord = -1;
+        this.a_Normal = -1;
+        this.u_Matrix_MVP = null;
+        this.u_Matrix_M_I = null;
+        this.u_LightPos = null;
+        this.u_LightColor = null;
+        this.u_Matrix_Light = null;
     }
 
     load()
     {
+        this.bLoaded = true;
         this.readShaderFile()
     }
 

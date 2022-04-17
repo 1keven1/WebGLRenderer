@@ -11,16 +11,19 @@ if (!gl)
 }
 let width = canvas.width;
 let height = canvas.height;
+// const editP = document.querySelector('textarea');
 
 class WebGLRenderer
 {
     /**
      * 
      * @param {Scene} scene 
+     * @param {Material} editableMat
      */
-    constructor(scene)
+    constructor(scene, editableMat = null)
     {
         this.scene = scene;
+        // this.editableMat = editableMat;
 
         gl.clearColor(0, 0, 0, 1);
     }
@@ -40,7 +43,9 @@ class WebGLRenderer
     startRenderLoop()
     {
         this.customBeginPlay();
-        
+        // if (this.editableMat) editP.textContent = this.editableMat.baseShader.fShaderSource;
+
+        console.log('开始渲染循环');
         let lastTime = 0;
         let deltaSecond = 0;
         let renderLoop = (timeStamp) =>
