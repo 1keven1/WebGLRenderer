@@ -123,22 +123,23 @@ class Scene
     render()
     {
         // 绘制灯光ShadowMap
-        this.lightList.forEach((light, index, arr) =>
+        this.lightList.forEach((light, lightIndex, arr) =>
         {
             gl.bindFramebuffer(gl.FRAMEBUFFER, light.shadowMap);
             gl.viewport(0, 0, light.shadowMapRes, light.shadowMapRes);
             gl.clearColor(0.0, 0.0, 0.0, 1.0);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-            this.meshList.forEach((mesh, index, arr) =>
+            this.meshList.forEach((mesh, meshIndex, arr) =>
             {
-                
+                this.drawShadowMap(mesh, light);
             })
         })
-        
+
         // 绘制到屏幕
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.viewport(0, 0, width, height);
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         this.lightList.forEach((light, lightIndex, arr) =>
@@ -148,6 +149,32 @@ class Scene
                 this.drawMesh(mesh, light, lightIndex);
             })
         })
+    }
+
+    /**
+     * 
+    * @param {Mesh} mesh 
+    * @param {Light} light 
+    */
+    drawShadowMap(mesh, light)
+    {
+        gl.useProgram(mesh.material.getShadowCasterProgram());
+
+        if (mesh.material.bDepthTest) gl.enable(gl.DEPTH_TEST);
+        else gl.disable(gl.DIPTH_TEST);
+
+        // 绑定Vertex Buffer
+        if (mesh.material.shadowCaster.a_Position >= 0) this.bindAttributeToBuffer(mesh.material.shadowCaster.a_Position, mesh.model.vertexBuffer);
+        if (mesh.material.shadowCaster.a_TexCoord >= 0) this.bindAttributeToBuffer(mesh.material.shadowCaster.a_TexCoord, mesh.model.texCoordBuffer);
+        if (mesh.material.shadowCaster.a_Normal >= 0) this.bindAttributeToBuffer(mesh.material.shadowCaster.a_Normal, mesh.model.normalBuffer);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.model.indexBuffer);
+
+        let mvpMatrix = new Matrix4().set(light.vpMatrix).multiply(mesh.mMatrix);
+        gl.uniformMatrix4fv(mesh.material.shadowCaster.u_Matrix_MVP, false, mvpMatrix.elements);
+        gl.uniformMatrix4fv(mesh.material.shadowCaster.u_Matrix_M_I, false, mesh.mIMatrix.elements);
+
+        // 绘制
+        gl.drawElements(gl.TRIANGLES, mesh.model.indexNum, mesh.model.indexBuffer.dataType, 0);
     }
 
     /**
@@ -172,15 +199,17 @@ class Scene
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.model.indexBuffer);
 
             // 传入默认变量
-            if (mesh.material.baseShader.u_LightPos) gl.uniform4f(mesh.material.baseShader.u_LightPos, light.getLocation().x(), light.getLocation().y(), light.getLocation().z(), light.w);
+            if (mesh.material.baseShader.u_LightPos) gl.uniform4f(mesh.material.baseShader.u_LightPos, light.getLightPos().x(), light.getLightPos().y(), light.getLightPos().z(), light.w);
             if (mesh.material.baseShader.u_LightColor) gl.uniform4f(mesh.material.baseShader.u_LightColor, light.lightColor.x(), light.lightColor.y(), light.lightColor.z(), 1);
 
             let mvpMatrix = new Matrix4().set(camera.vpMatrix).multiply(mesh.mMatrix);
             gl.uniformMatrix4fv(mesh.material.baseShader.u_Matrix_MVP, false, mvpMatrix.elements);
             gl.uniformMatrix4fv(mesh.material.baseShader.u_Matrix_M_I, false, mesh.mIMatrix.elements);
 
+            // 阴影相关变量
             let mvpMatrixLight = new Matrix4().set(light.vpMatrix).multiply(mesh.mMatrix);
             if (mesh.material.baseShader.u_Matrix_Light) gl.uniformMatrix4fv(mesh.material.baseShader.u_Matrix_Light, false, mvpMatrixLight.elements);
+            if (mesh.material.baseShader.u_ShadowMap) gl.uniform1i(mesh.material.baseShader.u_ShadowMap, light.shadowMapTexUnit - gl.TEXTURE0);
 
             // 绘制
             gl.drawElements(gl.TRIANGLES, mesh.model.indexNum, mesh.model.indexBuffer.dataType, 0);

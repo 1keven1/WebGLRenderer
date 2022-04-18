@@ -22,6 +22,7 @@ class Actor
     constructor(transform = new Transform())
     {
         this.transform = transform;
+        this.rotateMatrix = new Matrix4().setRotate(this.transform.rotation.x(), 1, 0, 0).rotate(this.transform.rotation.y(), 0, 1, 0).rotate(this.transform.rotation.z(), 0, 0, 1);
     }
 
     getLocation()
@@ -68,6 +69,16 @@ class Actor
     addRotationOffset(offset)
     {
         this.transform.rotation.add(offset);
+    }
+
+    getForwardVector()
+    {
+        return this.rotateMatrix.multiplyVector3(new Vector3([0, 0, -1]));
+    }
+
+    getUpVector()
+    {
+        return this.rotateMatrix.multiplyVector3(new Vector3([0, 1, 0]));
     }
 }
 
@@ -136,7 +147,7 @@ class Light extends Actor
 
         this.lightIndex = null;
         this.shadowMapTexUnit = null;
-        this.shadowMapRes = 1024;
+        this.shadowMapRes = 2048;
     }
 
     bulidVPMatrix()
@@ -144,11 +155,9 @@ class Light extends Actor
         switch (this.lightType)
         {
             case LIGHT_TYPE.DIRECTIONAL:
-                let rotateMatrix = new Matrix4().setRotate(this.transform.rotation.x(), 1, 0, 0).rotate(this.transform.rotation.y(), 0, 1, 0).rotate(this.transform.rotation.z(), 0, 0, 1);
-                let lookVec = rotateMatrix.multiplyVector3(new Vector3([0, 0, -1]));
-                let upVec = rotateMatrix.multiplyVector3(new Vector3([0, 1, 0]));
-
-                this.vpMatrix.setOrtho(-7, 7, -7, 7, 1, 100).
+                let lookVec = this.getForwardVector();
+                let upVec = this.getUpVector();
+                this.vpMatrix.setOrtho(-14, 14, -14, 14, -20, 50).
                     lookAt(this.transform.location.x(), this.transform.location.y(), this.transform.location.z(),
                         lookVec.x() + this.transform.location.x(), lookVec.y() + this.transform.location.y(), lookVec.z() + this.transform.location.z(),
                         upVec.x(), upVec.y(), upVec.z());
@@ -212,6 +221,20 @@ class Light extends Actor
 
         gl.bindRenderbuffer(gl.RENDERBUFFER, null);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    }
+
+    getLightPos()
+    {
+        switch (this.lightType)
+        {
+            case LIGHT_TYPE.DIRECTIONAL:
+                return this.getForwardVector().multiply(new Vector3([-1, -1, -1]));
+                break;
+            case LIGHT_TYPE.POINT:
+                break;
+            default:
+                break;
+        }
     }
 }
 

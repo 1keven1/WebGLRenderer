@@ -24,6 +24,7 @@ class Shader
         this.u_LightPos = null;
         this.u_LightColor = null;
         this.u_Matrix_Light = null;
+        this.u_ShadowMap = null;
     }
 
     load()

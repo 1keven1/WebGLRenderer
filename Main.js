@@ -1,6 +1,6 @@
 'use strict';
 let camera = new Camera(new Transform(new Vector3([0.0, 2.0, 6.0]), new Vector3([-20, 0, 0])), 60, 0.1, 100);
-let light = new Light(new Transform(new Vector3([10.0, 10.0, 10.0]), new Vector3([0, 0, 0])), new Vector3([1.0, 1.0, 1.0]), 10);
+let light = new Light(new Transform(new Vector3([0.0, 5.0, 0.0]), new Vector3([-45, 45, 0])), new Vector3([1.0, 1.0, 1.0]), 10);
 
 let shadowCaster = new Shader('./Resource/DefaultShader/ShadowCaster.vert', './Resource/DefaultShader/ShadowCaster.frag');
 let diffuseShader = new Shader('./Resource/DefaultShader/Diffuse.vert', './Resource/DefaultShader/Diffuse.frag');

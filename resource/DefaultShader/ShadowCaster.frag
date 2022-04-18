@@ -20,4 +20,5 @@ void main()
     vec4 rgbaDepth = fract(gl_FragCoord.z * bitShift);
     rgbaDepth -= rgbaDepth.gbaa * bitMask;
     gl_FragColor = rgbaDepth;
+    // gl_FragColor = vec4(gl_FragCoord.z, 0, 0, 1);
 }
