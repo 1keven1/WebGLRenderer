@@ -11,7 +11,7 @@ if (!gl)
 }
 let width = canvas.width;
 let height = canvas.height;
-// const editP = document.querySelector('textarea');
+const editP = document.querySelector('textarea');
 
 class WebGLRenderer
 {
@@ -20,30 +20,34 @@ class WebGLRenderer
      * @param {Scene} scene 
      * @param {Material} editableMat
      */
-    constructor(scene, editableMat = null)
+    constructor(editableMat = null)
     {
-        this.scene = scene;
+        this.scene = new Scene([], [], [], [], [], null);
         // this.editableMat = editableMat;
+
+        this.customJS = null;
 
         gl.clearColor(0, 0, 0, 1);
     }
 
     start()
     {
+        this.bulidScene(this.scene);
         // 加载场景
         this.scene.loadOver = this.startRenderLoop.bind(this);
         this.scene.load();
     }
 
-    customBeginPlay()
-    {
-        console.warn('未重写Custom Begin Play');
-    }
+    /**
+     * 
+     * @param {Scene} scene 
+     */
+    bulidScene(scene) {}
 
     startRenderLoop()
     {
         this.customBeginPlay();
-        // if (this.editableMat) editP.textContent = this.editableMat.baseShader.fShaderSource;
+        editP.textContent = this.customJS;
 
         console.log('开始渲染循环');
         let lastTime = 0;
@@ -59,6 +63,11 @@ class WebGLRenderer
             requestAnimationFrame(renderLoop);
         }
         renderLoop(0);
+    }
+
+    customBeginPlay()
+    {
+        console.warn('未重写Custom Begin Play');
     }
 
     /**

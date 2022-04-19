@@ -32,7 +32,7 @@ float getShadow() {
     vec3 shadowCoord = (v_PositionFromLight.xyz / v_PositionFromLight.w) / 2.0 + 0.5;
     vec4 rgbaDepth = texture2D(u_ShadowMap, shadowCoord.xy);
     float depth = unpackDepth(rgbaDepth);
-    float shadow = (shadowCoord.z > depth + 0.0001) ? 0.0 : 1.0;
+    float shadow = (shadowCoord.z > (depth + 0.000)) ? 0.0 : 1.0;
     return shadow;
 }
 

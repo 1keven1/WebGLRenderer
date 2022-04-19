@@ -127,7 +127,7 @@ class Scene
         {
             gl.bindFramebuffer(gl.FRAMEBUFFER, light.shadowMap);
             gl.viewport(0, 0, light.shadowMapRes, light.shadowMapRes);
-            gl.clearColor(0.0, 0.0, 0.0, 1.0);
+            gl.clearColor(1.0, 1.0, 1.0, 1.0);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
             this.meshList.forEach((mesh, meshIndex, arr) =>
@@ -202,7 +202,7 @@ class Scene
             if (mesh.material.baseShader.u_LightPos) gl.uniform4f(mesh.material.baseShader.u_LightPos, light.getLightPos().x(), light.getLightPos().y(), light.getLightPos().z(), light.w);
             if (mesh.material.baseShader.u_LightColor) gl.uniform4f(mesh.material.baseShader.u_LightColor, light.lightColor.x(), light.lightColor.y(), light.lightColor.z(), 1);
 
-            let mvpMatrix = new Matrix4().set(camera.vpMatrix).multiply(mesh.mMatrix);
+            let mvpMatrix = new Matrix4().set(this.camera.vpMatrix).multiply(mesh.mMatrix);
             gl.uniformMatrix4fv(mesh.material.baseShader.u_Matrix_MVP, false, mvpMatrix.elements);
             gl.uniformMatrix4fv(mesh.material.baseShader.u_Matrix_M_I, false, mesh.mIMatrix.elements);
 
