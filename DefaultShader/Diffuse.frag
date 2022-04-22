@@ -15,7 +15,6 @@ uniform vec4 u_LightColor;
 uniform sampler2D u_ShadowMap;
 
 uniform vec3 u_AmbientColor;
-uniform sampler2D u_Texture;
 
 varying vec4 v_TexCoord;
 varying vec3 v_WorldNormal;
@@ -32,12 +31,12 @@ float getShadow() {
     vec3 shadowCoord = (v_PositionFromLight.xyz / v_PositionFromLight.w) / 2.0 + 0.5;
     vec4 rgbaDepth = texture2D(u_ShadowMap, shadowCoord.xy);
     float depth = unpackDepth(rgbaDepth);
-    float shadow = (shadowCoord.z > (depth + 0.000)) ? 0.0 : 1.0;
+    float shadow = (shadowCoord.z > depth + 0.0001) ? 0.0 : 1.0;
     return shadow;
 }
 
 void main() {
-    vec3 albedo = texture2D(u_Texture, v_TexCoord.xy).xyz;
+    vec3 albedo = vec3(0.5, 0.5, 0.5);
 
     vec3 worldNormal = normalize(v_WorldNormal);
     vec3 lightDir = normalize(u_LightPos.xyz);

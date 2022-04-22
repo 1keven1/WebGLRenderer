@@ -59,14 +59,14 @@ class Scene
 
     modelLoadOver()
     {
-        console.log('mesh load over');
+        console.log('model load over');
         this.modelLoadedNum++;
         this.checkIfLoadOver();
     }
 
     materialLoadOver()
     {
-        console.log('mesh load over');
+        console.log('material load over');
         this.materialLoadedNum++;
         this.checkIfLoadOver();
     }
@@ -224,4 +224,20 @@ class Scene
         gl.enableVertexAttribArray(a_attribute);
     }
 
+    clear()
+    {
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        this.modelList = [];
+        this.materialList = [];
+        this.textureList = [];
+        this.meshList = [];
+        this.lightList = [];
+        this.camera = [];
+
+        this.modelLoadedNum = 0;
+        this.materialLoadedNum = 0;
+        this.textureLodedNum = 0;
+        this.lightLoadedNum = 0;
+    }
 }

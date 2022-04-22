@@ -96,6 +96,7 @@ class Material
 
     loadShader()
     {
+        // console.log(this);
         // 加载Base Shader
         if (!this.baseShader.bLoaded)
         {
@@ -107,7 +108,7 @@ class Material
             this.shadowCaster.loadOver = this.shaderLoadOver.bind(this);
             this.shadowCaster.load();
         }
-        if (this.baseShader.bLoaded && this.shadowCaster.bLoaded)
+        if (this.baseShader.program && this.shadowCaster.program)
             this.shaderLoadOver();
     }
 
