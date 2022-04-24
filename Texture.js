@@ -3,6 +3,7 @@ class Texture
 {
     /**
      * 
+     * @constructor
      * @param {String} texFile 
      * @param {any} texUnit 
      * @param {any} texType 

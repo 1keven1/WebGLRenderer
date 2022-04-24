@@ -15,14 +15,16 @@ let sphere = new Model('./Res/Model/Sphere.obj')
 let meshCube = new Mesh(new Transform(), cube, texMaterial);
 let floor = new Mesh(new Transform(new Vector3([0, -1, 0])), plane, diffuseMaterial);
 
-let texture = new Texture('./Res/Image/Test.jpg', gl.TEXTURE_2D);
+let textureSky = new Texture('./Res/Image/Sky.jpg', gl.TEXTURE_2D);
+let textureOnion = new Texture('./Res/Image/Test.jpg', gl.TEXTURE_2D);
 
+this.codeEditor.editableShaderList = [texShader];
 
 this.bulidScene = (scene) =>
 {
     scene.modelList = [cube, sphere, plane];
     scene.materialList = [diffuseMaterial, texMaterial];
-    scene.textureList = [texture];
+    scene.textureList = [textureSky, textureOnion];
     scene.meshList = [meshCube, floor];
     scene.lightList = [light];
     scene.camera = camera;
@@ -33,7 +35,7 @@ this.customBeginPlay = () =>
     meshCube.setRotation(new Vector3([0.0, 0.0, 0.0]));
     diffuseMaterial.setUniformVector3f('u_AmbientColor', 0.2, 0.2, 0.2);
     texMaterial.setUniformVector3f('u_AmbientColor', 0.2, 0.2, 0.2);
-    texMaterial.setTexture('u_Tex', 0);
+    texMaterial.setTexture('u_Texture', textureOnion);
 }
 
 this.customTick = (deltaSecond) =>

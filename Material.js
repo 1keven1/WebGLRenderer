@@ -109,32 +109,17 @@ class Material
             this.shadowCaster.load();
         }
         if (this.baseShader.program && this.shadowCaster.program)
-            this.shaderLoadOver();
+            this.loadOver();
     }
 
     shaderLoadOver()
     {
         if (this.baseShader.program && this.shadowCaster.program)
         {
-            this.initShaderProperties(this.baseShader);
-            this.initShaderProperties(this.shadowCaster);
+            this.baseShader.loadOver = null;
+            this.shadowCaster.loadOver = null;
             this.loadOver();
         }
-    }
-
-    initShaderProperties(shader)
-    {
-        // 初始化必要Shader变量
-        shader.a_Position = gl.getAttribLocation(shader.program, 'a_Position');
-        shader.a_TexCoord = gl.getAttribLocation(shader.program, 'a_TexCoord');
-        shader.a_Normal = gl.getAttribLocation(shader.program, 'a_Normal');
-
-        shader.u_Matrix_MVP = gl.getUniformLocation(shader.program, 'u_Matrix_MVP');
-        shader.u_Matrix_M_I = gl.getUniformLocation(shader.program, 'u_Matrix_M_I');
-        shader.u_LightPos = gl.getUniformLocation(shader.program, 'u_LightPos');
-        shader.u_LightColor = gl.getUniformLocation(shader.program, 'u_LightColor');
-        shader.u_Matrix_Light = gl.getUniformLocation(shader.program, 'u_Matrix_Light');
-        shader.u_ShadowMap = gl.getUniformLocation(shader.program, 'u_ShadowMap');
     }
 
     getBaseProgram()
@@ -181,13 +166,13 @@ class Material
     /**
      * 
      * @param {String} param 
-     * @param {Number} texUnitNum 
+     * @param {Texture} texture 
      */
-    setTexture(param, texUnitNum)
+    setTexture(param, texture)
     {
         gl.useProgram(this.getBaseProgram());
         let u_Param = gl.getUniformLocation(this.getBaseProgram(), param);
-        gl.uniform1i(u_Param, texUnitNum);
+        gl.uniform1i(u_Param, texture.texIndex);
         gl.useProgram(null);
     }
 }

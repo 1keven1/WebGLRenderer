@@ -15,7 +15,7 @@ class Shader
         this.program = null;
         this.bLoaded = false;
 
-        
+
         this.a_Position = -1;
         this.a_TexCoord = -1;
         this.a_Normal = -1;
@@ -70,6 +70,31 @@ class Shader
         {
             console.error(this.vShaderFile + '：编译失败');
         }
-        this.loadOver();
+        this.initProperties();
+        if (this.loadOver) this.loadOver();
+    }
+
+    initProperties()
+    {
+        // 初始化必要Shader变量
+        this.a_Position = gl.getAttribLocation(this.program, 'a_Position');
+        this.a_TexCoord = gl.getAttribLocation(this.program, 'a_TexCoord');
+        this.a_Normal = gl.getAttribLocation(this.program, 'a_Normal');
+
+        this.u_Matrix_MVP = gl.getUniformLocation(this.program, 'u_Matrix_MVP');
+        this.u_Matrix_M_I = gl.getUniformLocation(this.program, 'u_Matrix_M_I');
+        this.u_LightPos = gl.getUniformLocation(this.program, 'u_LightPos');
+        this.u_LightColor = gl.getUniformLocation(this.program, 'u_LightColor');
+        this.u_Matrix_Light = gl.getUniformLocation(this.program, 'u_Matrix_Light');
+        this.u_ShadowMap = gl.getUniformLocation(this.program, 'u_ShadowMap');
+    }
+
+    applyChange(vSource, fSource)
+    {
+        this.vShaderSource = vSource;
+        this.fShaderSource = fSource;
+
+        // console.log(this.fShaderFile);
+        this.compileShader();
     }
 }

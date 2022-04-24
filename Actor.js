@@ -17,6 +17,7 @@ class Actor
 {
     /**
      * 
+     * @constructor
      * @param {Transform} transform 
      */
     constructor(transform = new Transform())
@@ -86,6 +87,7 @@ class Mesh extends Actor
 {
     /**
      * 
+     * @constructor
      * @param {Transform} transform 
      * @param {Model} model 
      * @param {Material} material 
@@ -128,6 +130,7 @@ class Light extends Actor
 {
     /**
      * 
+     * @constructor
      * @param {Transform} transform 变换 
      * @param {Vector3} lightColor 灯光颜色
      * @param {Number} intensity 强度

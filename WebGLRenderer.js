@@ -34,8 +34,6 @@ class WebGLRenderer
         this.codeEditor.customJS = this.customJS;
 
         eval(this.customJS);
-
-        this.codeEditor.refresh();
         
         this.bulidScene(this.scene);
         // 加载场景
@@ -51,6 +49,8 @@ class WebGLRenderer
 
     startRenderLoop()
     {
+        this.codeEditor.refresh();
+
         this.customBeginPlay();
 
         console.log('开始渲染循环');
@@ -111,26 +111,38 @@ class CodeEditor
         this.renderer = renderer;
 
         this.customJS = null;
+        this.editableShaderList = [];
 
         this.editP = document.querySelector('textarea');
         this.applyButton = document.querySelector('.apply-code');
 
         this.applyButton.addEventListener('click', () =>
         {
-            this.applyCode();
+            // this.applyJSCode();
+            this.applyShaderCode(this.editableShaderList[0]);
         })
     }
 
     refresh()
     {
-        this.editP.textContent = this.customJS;
+        // this.editP.textContent = this.customJS;
+        this.editP.textContent = this.editableShaderList[0].fShaderSource;
     }
 
-    applyCode()
+    applyJSCode()
     {
         this.renderer.stop();
         this.renderer.clear();
         this.renderer.customJS = this.editP.value;
         this.renderer.start();
+    }
+
+    /**
+     * 
+     * @param {Shader} shader 
+     */
+    applyShaderCode(shader)
+    {
+        shader.applyChange(shader.vShaderSource, this.editP.value);
     }
 }
