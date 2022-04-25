@@ -33,8 +33,8 @@ this.bulidScene = (scene) =>
 this.customBeginPlay = () =>
 {
     meshCube.setRotation(new Vector3([0.0, 0.0, 0.0]));
-    diffuseMaterial.setUniformVector3f('u_AmbientColor', 0.2, 0.2, 0.2);
-    texMaterial.setUniformVector3f('u_AmbientColor', 0.2, 0.2, 0.2);
+    diffuseMaterial.setVector3f('u_AmbientColor', 0.2, 0.2, 0.2);
+    texMaterial.setVector3f('u_AmbientColor', 0.2, 0.2, 0.2);
     texMaterial.setTexture('u_Texture', textureOnion);
 }
 
