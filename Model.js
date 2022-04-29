@@ -314,7 +314,7 @@ StringParser.prototype.getWord = function ()
 {
     this.skipDelimiters();
     let n = getWordLength(this.str, this.index);
-    if (n == 0) return null;
+    if (n == 0 || this.str === '\r') return null;
     let word = this.str.substr(this.index, n);
     this.index += (n + 1);
 
