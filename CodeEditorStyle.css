@@ -1,0 +1,85 @@
+/* 标签设置 */
+.code-editor {
+    margin: 0;
+    height: 400px;
+    width: 700px;
+
+    display: flex;
+    flex-flow: nowrap column;
+    justify-content: space-between;
+
+    font-size: 1.6rem;
+}
+
+.tabs {
+    display: flex;
+    flex-flow: nowrap row;
+    /* overflow: auto; */
+}
+
+.tab {
+    flex: 1;
+    text-align: center;
+    line-height: 2;
+    border-radius: 10px 10px 0 0;
+    background-color: rgb(50, 50, 50);
+    color: white;
+    overflow: hidden;
+    white-space: nowrap;
+
+    padding: 3px;
+    padding-bottom: 1px;
+    cursor: pointer;
+}
+
+.tab:hover {
+    background-color: rgb(70, 70, 70);
+}
+
+.tab.enable {
+    border-bottom: 2px solid orange;
+    background-color: rgb(40, 40, 40);
+}
+
+/* 内容设置 */
+.panels {
+    flex: 1;
+    background-color: rgb(38, 36, 46);
+    color: white;
+}
+
+.panel {
+    padding: 0 1rem;
+    display: none;
+    word-wrap: break-word;
+}
+
+.panel.enable {
+    display: block;
+}
+
+/* 底栏设置 */
+.code-editor .footer {
+    background-color: rgb(50, 50, 50);
+}
+
+.apply-code {
+    float: right;
+    width: 20%;
+    line-height: 2;
+    text-align: center;
+    cursor: pointer;
+
+    font-size: 1.6rem;
+    border: none;
+    background-color: rgb(77, 207, 77);
+    color: white;
+}
+
+.apply-code:hover{
+    background-color: rgb(112, 226, 112);
+}
+
+.apply-code:active{
+    background-color: rgb(45, 163, 45);
+}

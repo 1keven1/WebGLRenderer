@@ -3,12 +3,29 @@
     <head>
         <meta charset="utf-8">
         <title>WebGL渲染器</title>
+        <link rel="stylesheet" href="./MainStyle.css">
+        <link rel="stylesheet" href="./CodeEditorStyle.css">
     </head>
     <body>
         <canvas width="700" height="700">请使用支持Canvas的浏览器</canvas>
         <!-- <canvas width="700" height="700"></canvas> -->
+
+        <section class="code-editor">
+            <div class="tabs">
+                <div class="tab">Tab1</div>
+                <div class="tab">Tab2</div>
+            </div>
+            <div class="panels">
+                <div class="panel">Tab1Tab1Tab1Tab1Tab1Tab1</div>
+                <div class="panel">Tab2Tab2Tab2Tab2Tab2Tab2Tab2Tab2</div>
+            </div>
+            <div class="footer">
+                <button class="apply-code">确定</button>
+            </div>
+        </section>
+
         <textarea rows="50" cols="100"></textarea>
-        <button class="apply-code">确定</button>
+        
 
         <script src="./Lib/webgl-utils.js"></script>
         <script src="./Lib/webgl-debug.js"></script>
