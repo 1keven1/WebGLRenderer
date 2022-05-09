@@ -1,6 +1,5 @@
 'use strict';
-function Transform(location = new Vector3([0, 0, 0]), rotation = new Vector3([0, 0, 0]), scale = new Vector3([1, 1, 1]))
-{
+function Transform(location = new Vector3([0, 0, 0]), rotation = new Vector3([0, 0, 0]), scale = new Vector3([1, 1, 1])) {
     this.location = location;
     this.rotation = rotation;
     this.scale = scale;
@@ -13,78 +12,64 @@ let LIGHT_TYPE = {
 }
 Object.freeze(LIGHT_TYPE);
 
-class Actor
-{
+class Actor {
     /**
      * 
      * @constructor
      * @param {Transform} transform 
      */
-    constructor(transform = new Transform())
-    {
+    constructor(transform = new Transform()) {
         this.transform = transform;
         this.rotateMatrix = new Matrix4().setRotate(this.transform.rotation.x(), 1, 0, 0).rotate(this.transform.rotation.y(), 0, 1, 0).rotate(this.transform.rotation.z(), 0, 0, 1);
     }
 
-    getLocation()
-    {
+    getLocation() {
         return this.transform.location.copy();
     }
 
-    getRotation()
-    {
+    getRotation() {
         return this.transform.rotation.copy();
     }
 
-    getScale()
-    {
+    getScale() {
         return this.transform.scale.copy();
     }
 
-    setLocation(location)
-    {
+    setLocation(location) {
         this.transform.location = location;
     }
 
-    setRotation(rotation)
-    {
+    setRotation(rotation) {
         this.transform.rotation = rotation;
     }
 
-    setLocationAndRotation(location, rotation)
-    {
+    setLocationAndRotation(location, rotation) {
         this.transform.location = location;
         this.transform.rotation = rotation;
     }
 
-    setScale(scale)
-    {
+    setScale(scale) {
         this.transform.scale = scale;
     }
 
-    addLocationOffset(offset)
-    {
+    addLocationOffset(offset) {
         this.transform.location.add(offset);
     }
 
-    addRotationOffset(offset)
-    {
+    addRotationOffset(offset) {
         this.transform.rotation.add(offset);
     }
 
-    getForwardVector()
-    {
+    getForwardVector() {
         return this.rotateMatrix.multiplyVector3(new Vector3([0, 0, -1]));
     }
 
-    getUpVector()
-    {
+    getUpVector() {
         return this.rotateMatrix.multiplyVector3(new Vector3([0, 1, 0]));
     }
 }
 
-class Mesh extends Actor
-{
+class Mesh extends Actor {
     /**
      * 
      * @constructor
@@ -93,8 +78,7 @@ class Mesh extends Actor
      * @param {Material} material 
      * @param {Boolean} bCastShadow 
      */
-    constructor(transform, model, material, bCastShadow = true)
-    {
+    constructor(transform, model, material, bCastShadow = true) {
         super(transform);
         this.model = model;
         this.material = material;
@@ -107,8 +91,7 @@ class Mesh extends Actor
      * 
      * @param {Mesh} mesh 
      */
-    copy()
-    {
+    copy() {
         let newMesh = new Mesh(this.transform.copy(), this.model, this.material, this.bCastShadow);
 
         return newMesh;
@@ -117,8 +100,7 @@ class Mesh extends Actor
     /**
      * 构造M矩阵
      */
-    bulidMMatrix()
-    {
+    bulidMMatrix() {
         this.mMatrix.setTranslate(this.transform.location.x(), this.transform.location.y(), this.transform.location.z()).
             rotate(this.transform.rotation.x(), 1, 0, 0).rotate(this.transform.rotation.y(), 0, 1, 0).rotate(this.transform.rotation.z(), 0, 0, 1).
             scale(this.transform.scale.x(), this.transform.scale.y(), this.transform.scale.z());
@@ -126,8 +108,7 @@ class Mesh extends Actor
     }
 }
 
-class Light extends Actor
-{
+class Light extends Actor {
     /**
      * 
      * @constructor
@@ -136,8 +117,7 @@ class Light extends Actor
      * @param {Number} intensity 强度
      * @param {LIGHT_TYPE} lightType 灯光类型
      */
-    constructor(transform, lightColor, intensity, lightType = LIGHT_TYPE.DIRECTIONAL)
-    {
+    constructor(transform, lightColor, intensity, lightType = LIGHT_TYPE.DIRECTIONAL) {
         super(transform);
         this.lightColor = lightColor;
         this.intensity = intensity;
@@ -153,10 +133,8 @@ class Light extends Actor
         this.shadowMapRes = 2048;
     }
 
-    bulidVPMatrix()
-    {
-        switch (this.lightType)
-        {
+    bulidVPMatrix() {
+        switch (this.lightType) {
             case LIGHT_TYPE.DIRECTIONAL:
                 let lookVec = this.getForwardVector();
                 let upVec = this.getUpVector();
@@ -174,15 +152,13 @@ class Light extends Actor
         }
     }
 
-    initShadowMap(lightIndex, startTexUnit)
-    {
+    initShadowMap(lightIndex, startTexUnit) {
         this.lightIndex = lightIndex;
         this.shadowMapTexUnit = gl.TEXTURE0 + startTexUnit + lightIndex;
         let texture, depthbuffer;
 
         // 错误函数
-        var error = () =>
-        {
+        var error = () => {
             if (texture) gl.deleteTexture(texture);
             if (depthbuffer) gl.deleteRenderbuffer(depthbuffer);
             if (framebuffer) gl.deleteFramebuffer(framebuffer);
@@ -192,7 +168,7 @@ class Light extends Actor
         // 创建贴图作为rgb通道
         texture = gl.createTexture();
         if (!texture) error();
-        
+
         gl.activeTexture(this.shadowMapTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.shadowMapRes, this.shadowMapRes, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
@@ -216,8 +192,7 @@ class Light extends Actor
 
         // 检查framebuffer是否完整
         let e = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
-        if (e !== gl.FRAMEBUFFER_COMPLETE)
-        {
+        if (e !== gl.FRAMEBUFFER_COMPLETE) {
             console.log('Framebuffer不完整');
             error();
         }
@@ -226,10 +201,8 @@ class Light extends Actor
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 
-    getLightPos()
-    {
-        switch (this.lightType)
-        {
+    getLightPos() {
+        switch (this.lightType) {
             case LIGHT_TYPE.DIRECTIONAL:
                 return this.getForwardVector().multiply(new Vector3([-1, -1, -1]));
                 break;
@@ -241,10 +214,8 @@ class Light extends Actor
     }
 }
 
-class Camera extends Actor
-{
-    constructor(transform, FOV = 60, nearClip = 0.1, farClip = 100)
-    {
+class Camera extends Actor {
+    constructor(transform, FOV = 60, nearClip = 0.1, farClip = 100) {
         super(transform);
         this.FOV = FOV;
         this.nearClip = nearClip;
@@ -253,8 +224,7 @@ class Camera extends Actor
         this.vpMatrix = new Matrix4();
     }
 
-    bulidVPMatrix()
-    {
+    bulidVPMatrix() {
         let rotateMatrix = new Matrix4().setRotate(this.transform.rotation.x(), 1, 0, 0).rotate(this.transform.rotation.y(), 0, 1, 0).rotate(this.transform.rotation.z(), 0, 0, 1);
         let lookVec = rotateMatrix.multiplyVector3(new Vector3([0, 0, -1]));
         let upVec = rotateMatrix.multiplyVector3(new Vector3([0, 1, 0]));

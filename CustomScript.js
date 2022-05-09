@@ -19,6 +19,7 @@ let textureSky = new Texture('./Res/Image/Sky.jpg', gl.TEXTURE_2D);
 let textureOnion = new Texture('./Res/Image/Test.jpg', gl.TEXTURE_2D);
 
 this.codeEditor.editableShaderList = [texShader];
+this.clearColor = [0.1, 0.1, 0.11, 1.0];
 
 this.bulidScene = (scene) =>
 {

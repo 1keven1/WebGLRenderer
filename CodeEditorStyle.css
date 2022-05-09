@@ -1,8 +1,6 @@
 /* 标签设置 */
 .code-editor {
     margin: 0;
-    height: 400px;
-    width: 700px;
 
     display: flex;
     flex-flow: nowrap column;
@@ -14,44 +12,60 @@
 .tabs {
     display: flex;
     flex-flow: nowrap row;
-    /* overflow: auto; */
+    background-color: hsl(270, 20%, 22%);
 }
 
 .tab {
     flex: 1;
     text-align: center;
     line-height: 2;
-    border-radius: 10px 10px 0 0;
-    background-color: rgb(50, 50, 50);
+    /* border-radius: 10px 10px 0 0; */
+    margin: 0 1.5px;
+    background-color: hsl(270, 21%, 19%);
     color: white;
     overflow: hidden;
     white-space: nowrap;
 
     padding: 3px;
-    padding-bottom: 1px;
+    padding-bottom: 0px;
     cursor: pointer;
 }
 
+.tab:first-child {
+    margin-left: 0;
+}
+
+.tab:last-child{
+    margin-right: 0;
+}
+
 .tab:hover {
-    background-color: rgb(70, 70, 70);
+    background-color: hsl(270, 21%, 26%);
 }
 
 .tab.enable {
-    border-bottom: 2px solid orange;
-    background-color: rgb(40, 40, 40);
+    border-bottom: 3px solid hsl(280, 90%, 50%);
+    background-color: hsl(270, 21%, 14%);
 }
 
 /* 内容设置 */
 .panels {
     flex: 1;
-    background-color: rgb(38, 36, 46);
+    background-color: hsl(270, 15%, 17%);
     color: white;
+    overflow: auto;
+    scroll-behavior: smooth;
+    
+
+    font-family: 'Courier New', Courier, monospace;
 }
 
 .panel {
-    padding: 0 1rem;
+    padding: 1rem 1rem;
     display: none;
-    word-wrap: break-word;
+    white-space: pre;
+
+    font-size: 1.4rem;
 }
 
 .panel.enable {
@@ -60,7 +74,7 @@
 
 /* 底栏设置 */
 .code-editor .footer {
-    background-color: rgb(50, 50, 50);
+    background-color: hsl(270, 20%, 22%);
 }
 
 .apply-code {
@@ -76,10 +90,10 @@
     color: white;
 }
 
-.apply-code:hover{
+.apply-code:hover {
     background-color: rgb(112, 226, 112);
 }
 
-.apply-code:active{
+.apply-code:active {
     background-color: rgb(45, 163, 45);
 }

@@ -210,7 +210,7 @@ class Material
 
     shaderChanged()
     {
-        console.log(this.attributeList);
+        // console.log(this.attributeList);
         gl.useProgram(this.getBaseProgram());
         for (let i = 0; i < this.attributeList.length; i++)
         {
