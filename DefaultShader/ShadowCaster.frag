@@ -13,6 +13,7 @@ uniform mat4 u_Matrix_MVP;
 uniform vec4 u_LightPos;
 uniform vec4 u_LightColor;
 
+// 基本不用改
 void main()
 {
     const vec4 bitShift = vec4(1.0, 256.0, 256.0 * 256.0, 256.0 * 256.0 * 256.0);
@@ -20,5 +21,4 @@ void main()
     vec4 rgbaDepth = fract(gl_FragCoord.z * bitShift);
     rgbaDepth -= rgbaDepth.gbaa * bitMask;
     gl_FragColor = rgbaDepth;
-    // gl_FragColor = vec4(gl_FragCoord.z, 0, 0, 1);
 }

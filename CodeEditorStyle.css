@@ -13,18 +13,23 @@
     display: flex;
     flex-flow: nowrap row;
     background-color: hsl(270, 20%, 22%);
+    white-space: nowrap;
+
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .tab {
     flex: 1;
     text-align: center;
     line-height: 2;
-    /* border-radius: 10px 10px 0 0; */
     margin: 0 1.5px;
+
+    color: hsl(0, 0%, 70%);
     background-color: hsl(270, 21%, 19%);
-    color: white;
     overflow: hidden;
-    white-space: nowrap;
 
     padding: 3px;
     padding-bottom: 0px;
@@ -35,7 +40,7 @@
     margin-left: 0;
 }
 
-.tab:last-child{
+.tab:last-child {
     margin-right: 0;
 }
 
@@ -44,6 +49,7 @@
 }
 
 .tab.enable {
+    color: white;
     border-bottom: 3px solid hsl(280, 90%, 50%);
     background-color: hsl(270, 21%, 14%);
 }
@@ -55,7 +61,6 @@
     color: white;
     overflow: auto;
     scroll-behavior: smooth;
-    
 
     font-family: 'Courier New', Courier, monospace;
 }
@@ -65,7 +70,7 @@
     display: none;
     white-space: pre;
 
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 }
 
 .panel.enable {
@@ -83,6 +88,8 @@
     line-height: 2;
     text-align: center;
     cursor: pointer;
+    white-space: nowrap;
+    padding: 0;
 
     font-size: 1.6rem;
     border: none;
@@ -96,4 +103,43 @@
 
 .apply-code:active {
     background-color: rgb(45, 163, 45);
+}
+
+/* resize */
+.code-editor .resize-handler {
+    background-color: transparent;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    height: auto;
+    width: 5px;
+    left: -1px;
+    cursor: ew-resize;
+
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.code-editor .resize-handler:hover {
+    background-color: hsl(270, 15%, 30%);
+    z-index: 10;
+}
+
+
+.toggle-code {
+    position: absolute;
+    bottom: 5px;
+    left: -40px;
+    width: 40px;
+    height: 100px;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    background-color: rebeccapurple;
+    cursor: pointer;
+}
+
+.toggle-code:hover {
+    background-color: hsl(280, 90%, 50%);
 }

@@ -139,8 +139,6 @@ class Scene
 
         // 绘制到屏幕
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        // gl.drawingBufferHeight = 500;
-        // gl.drawingBufferWidth = 500;
         gl.viewport(0, 0, width, height);
         gl.clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);

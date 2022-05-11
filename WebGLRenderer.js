@@ -22,21 +22,12 @@ class WebGLRenderer {
         this.customJS = null;
         this.frameRequest = null;
         this.codeEditor = new CodeEditor(this);
-        this.codeEditorSize = 0.4;
         this.clearColor = [0.0, 0.0, 0.0, 1.0];
 
-        this.codeEditor.changeSize(window.innerWidth * this.codeEditorSize);
-        height = canvas.clientHeight;
-        width = canvas.clientWidth;
-        canvas.height = height;
-        canvas.width = width;
+        this.codeEditor.changeSize(window.innerWidth * this.codeEditor.sizePercent);
 
         window.onresize = () => {
-            this.codeEditor.changeSize(window.innerWidth * this.codeEditorSize);
-            height = canvas.clientHeight;
-            width = canvas.clientWidth;
-            canvas.height = height;
-            canvas.width = width;
+            this.codeEditor.changeSize(window.innerWidth * this.codeEditor.sizePercent);
         }
     }
 
@@ -70,7 +61,6 @@ class WebGLRenderer {
 
             if (deltaSecond > 1) deltaSecond = 0.01;
             this.customTick(deltaSecond);
-            // console.log(canvas.width)
 
             this.scene.calculateMatrices();
             this.scene.render(this.clearColor);
@@ -130,13 +120,27 @@ class CodeEditor {
         this.editableShaderList = [];
         this.tabs = [];
         this.panels = [];
+        this.sizePercent = 0.4;
 
         this.codeEditor = document.querySelector('.code-editor');
-        this.tabContainer = document.querySelector('.tabs');
-        this.panelContainer = document.querySelector('.panels');
-        this.applyButton = document.querySelector('.apply-code');
+        this.toogleCode = this.codeEditor.querySelector('.toggle-code');
+        this.tabContainer = this.codeEditor.querySelector('.tabs');
+        this.panelContainer = this.codeEditor.querySelector('.panels');
+        this.applyButton = this.codeEditor.querySelector('.apply-code');
+        this.resizeHandler = this.codeEditor.querySelector('.resize-handler');
         this.choise = -1;
+        this.visability = false;
 
+        this.implementEvents();
+    }
+
+    implementEvents() {
+        // 切换代码显示
+        this.toogleCode.addEventListener('click', () => {
+            this.setVisability(!this.visability);
+        })
+
+        // 确定按钮
         this.applyButton.addEventListener('click', () => {
             let tab = this.tabs[this.choise];
             let code = this.panels[this.choise].textContent;
@@ -156,6 +160,24 @@ class CodeEditor {
                     break;
             }
         })
+
+        // resize操作
+        this.resizeHandler.addEventListener('mousedown', (ev) => {
+            this.resizeHandler.holding = true;
+            this.panelContainer.blur();
+        })
+
+        document.addEventListener('mouseup', (ev) => {
+            this.resizeHandler.holding = false;
+        })
+
+        document.addEventListener('mousemove', (ev) => {
+            if (this.resizeHandler.holding) {
+                let w = window.innerWidth - ev.clientX;
+                this.sizePercent = w / window.innerWidth;
+                this.changeSize(w);
+            }
+        })
     }
 
     refresh() {
@@ -171,6 +193,8 @@ class CodeEditor {
         })
 
         this.chooseTab(this.tabs[0]);
+
+        this.setVisability(this.visability);
     }
 
     removeTabs() {
@@ -256,8 +280,35 @@ class CodeEditor {
         shader.applyChange(shader.vShaderSource, code);
     }
 
-    changeSize(width) {
-        this.codeEditor.style.width = width + 'px';
+    changeSize(w, clamp = true) {
+        if (!this.visability) {
+            this.codeEditor.style.width = 0 + 'px';
+            height = canvas.clientHeight;
+            width = canvas.clientWidth;
+            canvas.height = height;
+            canvas.width = width;
+            return;
+        }
+        if (clamp) {
+            if (w > window.innerWidth * 0.9) w = window.innerWidth * 0.9;
+            if (w < window.innerWidth * 0.1) w = window.innerWidth * 0.1;
+        }
+        this.codeEditor.style.width = w + 'px';
+        height = canvas.clientHeight;
+        width = canvas.clientWidth;
+        canvas.height = height;
+        canvas.width = width;
+    }
+
+    setVisability(visability) {
+        if (this.visability === visability) return;
+        this.visability = visability;
+        if (visability) {
+            this.changeSize(window.innerWidth * this.sizePercent);
+        }
+        else {
+            this.changeSize(0, false);
+        }
     }
 }
 

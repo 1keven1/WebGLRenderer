@@ -26,8 +26,8 @@ float unpackDepth(const in vec4 rgbaDepth) {
     return depth;
 }
 
+// 获得阴影
 float getShadow() {
-    // 阴影
     vec3 shadowCoord = (v_PositionFromLight.xyz / v_PositionFromLight.w) / 2.0 + 0.5;
     vec4 rgbaDepth = texture2D(u_ShadowMap, shadowCoord.xy);
     float depth = unpackDepth(rgbaDepth);
@@ -35,6 +35,7 @@ float getShadow() {
     return shadow;
 }
 
+// Main函数在这里
 void main() {
     vec3 albedo = vec3(0.5, 0.5, 0.5);
 

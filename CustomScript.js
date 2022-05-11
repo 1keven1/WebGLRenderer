@@ -1,3 +1,4 @@
+// 创建需要用到的东西
 let camera = new Camera(new Transform(new Vector3([0.0, 2.0, 6.0]), new Vector3([-20, 0, 0])), 60, 0.1, 100);
 let light = new Light(new Transform(new Vector3([0.0, 5.0, 0.0]), new Vector3([-45, 45, 0])), new Vector3([1.0, 1.0, 1.0]), 10);
 
@@ -18,9 +19,11 @@ let floor = new Mesh(new Transform(new Vector3([0, -1, 0])), plane, diffuseMater
 let textureSky = new Texture('./Res/Image/Sky.jpg', gl.TEXTURE_2D);
 let textureOnion = new Texture('./Res/Image/Test.jpg', gl.TEXTURE_2D);
 
+// 想编辑的Shader列表
 this.codeEditor.editableShaderList = [texShader];
 this.clearColor = [0.1, 0.1, 0.11, 1.0];
 
+// 传入所有需要初始化的资源
 this.bulidScene = (scene) =>
 {
     scene.modelList = [cube, sphere, plane];
@@ -31,6 +34,7 @@ this.bulidScene = (scene) =>
     scene.camera = camera;
 }
 
+// 在运行时执行一次
 this.customBeginPlay = () =>
 {
     meshCube.setRotation(new Vector3([0.0, 0.0, 0.0]));
@@ -39,22 +43,8 @@ this.customBeginPlay = () =>
     texMaterial.setTexture('u_Texture', textureOnion);
 }
 
+// 在运行时逐帧执行
 this.customTick = (deltaSecond) =>
 {
     meshCube.addRotationOffset(new Vector3([0, 1.5, 0]).multiplyf(deltaSecond));
 }
-
-/*
-document.onmousedown = () =>
-{
-    meshCube.material = diffuseMaterial;
-    meshCube.model = sphere;
-    floor.material = texMaterial;
-}
-document.onmouseup = () =>
-{
-    meshCube.material = texMaterial;
-    meshCube.model = cube;
-    floor.material = diffuseMaterial;
-}
-*/
