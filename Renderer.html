@@ -11,7 +11,7 @@
 <body>
     <div class="layout">
         <div class="renderer">
-            <canvas>请使用支持Canvas的浏览器</canvas> 
+            <canvas>请使用支持Canvas的浏览器</canvas>
         </div>
 
         <section class="code-editor">
@@ -43,7 +43,22 @@
     <script src="./WebGLRenderer.js"></script>
     <script src="./FunctionLibrary.js"></script>
 
-    <script src="./Main.js"></script>
+    <script>
+        let renderer;
+        let request = new XMLHttpRequest();
+
+        request.onreadystatechange = () => {
+            if (request.readyState === 4 && request.status !== 404) {
+                let customJS = request.responseText;
+
+                renderer = new WebGLRenderer();
+                renderer.customJS = customJS;
+                renderer.start();
+            }
+        }
+        request.open('GET', './CustomScript.js', true);
+        request.send();
+    </script>
 </body>
 
 </html>

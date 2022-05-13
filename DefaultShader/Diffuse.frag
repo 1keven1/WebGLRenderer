@@ -16,7 +16,7 @@ uniform sampler2D u_ShadowMap;
 
 uniform vec3 u_AmbientColor;
 
-varying vec4 v_TexCoord;
+varying vec2 v_TexCoord;
 varying vec3 v_WorldNormal;
 varying vec4 v_PositionFromLight;
 

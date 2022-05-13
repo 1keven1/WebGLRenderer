@@ -211,7 +211,7 @@ class CodeEditor {
 
     spawnTabs() {
         // 生成标签
-        let tabNames = ['script'];
+        let tabNames = ['Script'];
         let tabTarget = ['js'];
         let tabType = [CODE_TYPE.JS];
         let panelContents = [this.customJS];

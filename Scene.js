@@ -1,6 +1,5 @@
 'use strict';
-class Scene
-{
+class Scene {
     /**
      * 
      * @param {Model[]} modelList 
@@ -10,8 +9,7 @@ class Scene
      * @param {Light[]} lightList 
      * @param {Camera} camera 
      */
-    constructor(modelList, materialList, textureList, meshList, lightList, camera)
-    {
+    constructor(modelList, materialList, textureList, meshList, lightList, camera) {
         this.modelList = modelList;
         this.materialList = materialList;
         this.textureList = textureList;
@@ -25,31 +23,26 @@ class Scene
         this.lightLoadedNum = 0;
     }
 
-    load()
-    {
+    load() {
         console.log('loading scene');
         // 加载Model
-        this.modelList.forEach((model, index, arr) =>
-        {
+        this.modelList.forEach((model, index, arr) => {
             model.loadOver = this.modelLoadOver.bind(this);
             model.load()
         })
         // 加载Material
-        this.materialList.forEach((material, index, arr) =>
-        {
+        this.materialList.forEach((material, index, arr) => {
             material.loadOver = this.materialLoadOver.bind(this);
             material.load();
         })
         // 加载贴图
-        this.textureList.forEach((texture, index, arr) =>
-        {
+        this.textureList.forEach((texture, index, arr) => {
             texture.loadOver = this.textureLoadOver.bind(this);
             texture.load(index);
         })
 
         // 初始化灯光ShadowMap
-        this.lightList.forEach((light, index, arr) =>
-        {
+        this.lightList.forEach((light, index, arr) => {
             light.initShadowMap(index, this.textureList.length);
             this.lightLoadOver();
         })
@@ -57,44 +50,36 @@ class Scene
 
     loadOver() { }
 
-    modelLoadOver()
-    {
+    modelLoadOver() {
         console.log('model load over');
         this.modelLoadedNum++;
         this.checkIfLoadOver();
     }
 
-    materialLoadOver()
-    {
+    materialLoadOver() {
         console.log('material load over');
         this.materialLoadedNum++;
         this.checkIfLoadOver();
     }
 
-    textureLoadOver()
-    {
+    textureLoadOver() {
         console.log('texture load over');
         this.textureLodedNum++;
         this.checkIfLoadOver();
     }
 
-    lightLoadOver()
-    {
+    lightLoadOver() {
         this.lightLoadedNum++;
         this.checkIfLoadOver();
     }
 
-    checkIfLoadOver()
-    {
+    checkIfLoadOver() {
         if (this.modelLoadedNum === this.modelList.length &&
             this.materialLoadedNum === this.materialList.length &&
             this.textureLodedNum === this.textureList.length &&
-            this.lightLoadedNum === this.lightList.length)
-        {
-            for (let i = 0; i < this.meshList.length; i++)
-            {
-                if (!this.meshList[i].model.bLoaded || !this.meshList[i].material.bLoaded)
-                {
+            this.lightLoadedNum === this.lightList.length) {
+            for (let i = 0; i < this.meshList.length; i++) {
+                if (!this.meshList[i].model.bLoaded || !this.meshList[i].material.bLoaded) {
                     if (!this.meshList[i].model.bLoaded) console.warn(this.meshList[i].model.objFile + '：没有加载完整');
                     if (!this.meshList[i].material.bLoaded) console.warn(this.meshList[i].material.baseShader.vShaderFile + '：没有加载');
                     this.meshList.splice(i, 1);
@@ -105,35 +90,29 @@ class Scene
         }
     }
 
-    calculateMatrices()
-    {
+    calculateMatrices() {
         // 计算Mesh的M矩阵
-        this.meshList.forEach((mesh, index, arr) =>
-        {
+        this.meshList.forEach((mesh, index, arr) => {
             mesh.bulidMMatrix();
         })
         // 计算灯光VP矩阵
-        this.lightList.forEach((light, index, arr) =>
-        {
+        this.lightList.forEach((light, index, arr) => {
             light.bulidVPMatrix();
         })
         // 计算相机VP矩阵
         this.camera.bulidVPMatrix();
     }
 
-    render(clearColor)
-    {
+    render(clearColor) {
         // 绘制灯光ShadowMap
-        this.lightList.forEach((light, lightIndex, arr) =>
-        {
+        this.lightList.forEach((light, lightIndex, arr) => {
             gl.bindFramebuffer(gl.FRAMEBUFFER, light.shadowMap);
             gl.viewport(0, 0, light.shadowMapRes, light.shadowMapRes);
             gl.clearColor(1.0, 1.0, 1.0, 1.0);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-            this.meshList.forEach((mesh, meshIndex, arr) =>
-            {
-                this.drawShadowMap(mesh, light);
+            this.meshList.forEach((mesh, meshIndex, arr) => {
+                if (mesh.bCastShadow) this.drawShadowMap(mesh, light);
             })
         })
 
@@ -143,10 +122,8 @@ class Scene
         gl.clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        this.lightList.forEach((light, lightIndex, arr) =>
-        {
-            this.meshList.forEach((mesh, meshIndex, arr) =>
-            {
+        this.lightList.forEach((light, lightIndex, arr) => {
+            this.meshList.forEach((mesh, meshIndex, arr) => {
                 this.drawMesh(mesh, light, lightIndex);
             })
         })
@@ -157,8 +134,7 @@ class Scene
     * @param {Mesh} mesh 
     * @param {Light} light 
     */
-    drawShadowMap(mesh, light)
-    {
+    drawShadowMap(mesh, light) {
         gl.useProgram(mesh.material.getShadowCasterProgram());
 
         if (mesh.material.bDepthTest) gl.enable(gl.DEPTH_TEST);
@@ -183,15 +159,30 @@ class Scene
      * @param {Mesh} mesh 
      * @param {Light} light 
      */
-    drawMesh(mesh, light)
-    {
+    drawMesh(mesh, light) {
         // Base Shader进行渲染
-        if (light.lightIndex === 0)
-        {
+        if (light.lightIndex === 0) {
             gl.useProgram(mesh.material.getBaseProgram());
 
             if (mesh.material.bDepthTest) gl.enable(gl.DEPTH_TEST);
             else gl.disable(gl.DIPTH_TEST);
+
+            switch (mesh.material.cullMode) {
+                case CULL_MODE.BACK:
+                    gl.enable(gl.CULL_FACE);
+                    gl.cullFace(gl.BACK);
+                    break;
+                case CULL_MODE.FRONT:
+                    gl.enable(gl.CULL_FACE);
+                    gl.cullFace(gl.FRONT);
+                    break;
+                case CULL_MODE.OFF:
+                    gl.disable(gl.CULL_FACE);
+                    break;
+                default:
+                    console.warn("有不正确的Cull Type");
+                    break;
+            }
 
             // 绑定Vertex Buffer
             if (mesh.material.baseShader.a_Position >= 0) this.bindAttributeToBuffer(mesh.material.baseShader.a_Position, mesh.model.vertexBuffer);
@@ -218,15 +209,13 @@ class Scene
         else { }
     }
 
-    bindAttributeToBuffer(a_attribute, buffer)
-    {
+    bindAttributeToBuffer(a_attribute, buffer) {
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
         gl.vertexAttribPointer(a_attribute, buffer.dataNum, buffer.dataType, false, 0, 0);
         gl.enableVertexAttribArray(a_attribute);
     }
 
-    clear()
-    {
+    clear() {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         this.modelList = [];

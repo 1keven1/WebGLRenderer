@@ -1,6 +1,6 @@
 attribute vec4 a_Position;
-attribute vec4 a_TexCoord;
-attribute vec4 a_Normal;
+attribute vec2 a_TexCoord;
+attribute vec3 a_Normal;
 
 uniform mat4 u_Matrix_M_I;
 uniform mat4 u_Matrix_MVP;

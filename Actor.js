@@ -20,6 +20,10 @@ class Actor {
      */
     constructor(transform = new Transform()) {
         this.transform = transform;
+
+    }
+
+    updateMatrics() {
         this.rotateMatrix = new Matrix4().setRotate(this.transform.rotation.x(), 1, 0, 0).rotate(this.transform.rotation.y(), 0, 1, 0).rotate(this.transform.rotation.z(), 0, 0, 1);
     }
 
@@ -60,11 +64,16 @@ class Actor {
         this.transform.rotation.add(offset);
     }
 
+    getRotateMatrix() {
+        return this.rotateMatrix;
+    }
+
     getForwardVector() {
         return this.rotateMatrix.multiplyVector3(new Vector3([0, 0, -1]));
     }
 
     getUpVector() {
+        let rotateMatrix = this.getRotateMatrix();
         return this.rotateMatrix.multiplyVector3(new Vector3([0, 1, 0]));
     }
 }
@@ -83,8 +92,13 @@ class Mesh extends Actor {
         this.model = model;
         this.material = material;
         this.bCastShadow = bCastShadow;
+
         this.mMatrix = new Matrix4();
         this.mIMatrix = new Matrix4();
+    }
+
+    setCastShadow(bCastShadow) {
+        this.bCastShadow = bCastShadow;
     }
 
     /**
@@ -101,6 +115,7 @@ class Mesh extends Actor {
      * 构造M矩阵
      */
     bulidMMatrix() {
+        this.updateMatrics();
         this.mMatrix.setTranslate(this.transform.location.x(), this.transform.location.y(), this.transform.location.z()).
             rotate(this.transform.rotation.x(), 1, 0, 0).rotate(this.transform.rotation.y(), 0, 1, 0).rotate(this.transform.rotation.z(), 0, 0, 1).
             scale(this.transform.scale.x(), this.transform.scale.y(), this.transform.scale.z());
@@ -134,6 +149,7 @@ class Light extends Actor {
     }
 
     bulidVPMatrix() {
+        this.updateMatrics();
         switch (this.lightType) {
             case LIGHT_TYPE.DIRECTIONAL:
                 let lookVec = this.getForwardVector();
@@ -142,6 +158,7 @@ class Light extends Actor {
                     lookAt(this.transform.location.x(), this.transform.location.y(), this.transform.location.z(),
                         lookVec.x() + this.transform.location.x(), lookVec.y() + this.transform.location.y(), lookVec.z() + this.transform.location.z(),
                         upVec.x(), upVec.y(), upVec.z());
+                // console.log(this.vpMatrix);
                 break;
             case LIGHT_TYPE.POINT:
                 break;
@@ -225,6 +242,7 @@ class Camera extends Actor {
     }
 
     bulidVPMatrix() {
+        this.updateMatrics();
         let rotateMatrix = new Matrix4().setRotate(this.transform.rotation.x(), 1, 0, 0).rotate(this.transform.rotation.y(), 0, 1, 0).rotate(this.transform.rotation.z(), 0, 0, 1);
         let lookVec = rotateMatrix.multiplyVector3(new Vector3([0, 0, -1]));
         let upVec = rotateMatrix.multiplyVector3(new Vector3([0, 1, 0]));
@@ -234,5 +252,11 @@ class Camera extends Actor {
                 this.transform.location.x(), this.transform.location.y(), this.transform.location.z(),
                 lookVec.x() + this.transform.location.x(), lookVec.y() + this.transform.location.y(), lookVec.z() + this.transform.location.z(),
                 upVec.x(), upVec.y(), upVec.z());
+    }
+}
+
+class simpleRotateCamera extends Camera {
+    constructor(lookAtPoint = new Vector3([0, 0, 0]), distance = 6, FOV = 60, nearClip = 0.1, farClip = 100) {
+        
     }
 }

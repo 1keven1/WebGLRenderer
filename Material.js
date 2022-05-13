@@ -6,7 +6,7 @@
 1500：蒙版
 2000：半透明 叠加
 */
-let MATERIAL_TYPE = {
+const MATERIAL_TYPE = {
     OPAQUE: Symbol(0),
     MASKED: Symbol(1),
     TRANSLUCENT: Symbol(2),
@@ -14,7 +14,14 @@ let MATERIAL_TYPE = {
 }
 Object.freeze(MATERIAL_TYPE);
 
-let ATTRIBURE_TYPE = {
+const CULL_MODE = {
+    BACK: Symbol(0),
+    FRONT: Symbol(1),
+    OFF: Symbol(2)
+}
+Object.freeze(CULL_MODE);
+
+const ATTRIBURE_TYPE = {
     SCALAR: Symbol(0),
     VECTOR3: Symbol(1),
     VECTOR4: Symbol(2),
@@ -36,6 +43,8 @@ class Material
         this.baseShader = baseShader;
         this.shadowCaster = shadowCaster;
 
+        this.cullMode = CULL_MODE.BACK;
+
         this.setMaterialType(materialType, queueOffset);
 
         this.bLoaded = false;
@@ -48,7 +57,6 @@ class Material
         {
             case MATERIAL_TYPE.OPAQUE:
                 this.bDepthTest = true;
-                this.bCull = true;
                 this.bBlend = false;
                 this.srcFactor = gl.SRC_ALPHA;
                 this.desFactor = gl.ONE_MINUS_SRC_ALPHA;
@@ -56,7 +64,6 @@ class Material
                 break;
             case MATERIAL_TYPE.MASKED:
                 this.bDepthTest = true;
-                this.bCull = true;
                 this.bBlend = false;
                 this.srcFactor = gl.SRC_ALPHA;
                 this.desFactor = gl.ONE_MINUS_SRC_ALPHA;
@@ -64,7 +71,6 @@ class Material
                 break;
             case MATERIAL_TYPE.TRANSLUCENT:
                 this.bDepthTest = false;
-                this.bCull = true;
                 this.bBlend = true;
                 this.srcFactor = gl.SRC_ALPHA;
                 this.desFactor = gl.ONE_MINUS_SRC_ALPHA;
@@ -72,7 +78,6 @@ class Material
                 break;
             case MATERIAL_TYPE.ADDITIVE:
                 this.bDepthTest = false;
-                this.bCull = true;
                 this.bBlend = true;
                 this.srcFactor = gl.ONE;
                 this.desFactor = gl.ONE;
@@ -80,7 +85,6 @@ class Material
                 break;
             default:
                 this.bDepthTest = true;
-                this.bCull = true;
                 this.bBlend = false;
                 this.srcFactor = gl.SRC_ALPHA;
                 this.desFactor = gl.ONE_MINUS_SRC_ALPHA;
@@ -96,6 +100,10 @@ class Material
         this.desFactor = desFactor;
     }
 
+    setCullMode(cullMode){
+        this.cullMode = cullMode;
+    }
+
     load()
     {
         this.bLoaded = true;
@@ -106,7 +114,6 @@ class Material
 
     loadShader()
     {
-        // console.log(this);
         // 加载Base Shader
         if (!this.baseShader.bLoaded)
         {
