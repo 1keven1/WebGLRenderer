@@ -1,4 +1,5 @@
 'use strict';
+
 Vector3.prototype.x = function ()
 {
     return this.elements[0];

@@ -21,10 +21,19 @@ class Actor {
     constructor(transform = new Transform()) {
         this.transform = transform;
 
+        this.rotateMatrix = new Matrix4();
+
     }
 
     updateMatrics() {
-        this.rotateMatrix = new Matrix4().setRotate(this.transform.rotation.x(), 1, 0, 0).rotate(this.transform.rotation.y(), 0, 1, 0).rotate(this.transform.rotation.z(), 0, 0, 1);
+        if (this.getRotation().x() > 360) this.transform.rotation.substract(new Vector3([360, 0, 0]));
+        if (this.getRotation().y() > 360) this.transform.rotation.substract(new Vector3([0, 360, 0]));
+        if (this.getRotation().z() > 360) this.transform.rotation.substract(new Vector3([0, 0, 360]));
+
+        // 构建旋转矩阵 顺规为ZYX
+        this.rotateMatrix.setRotate(this.transform.rotation.z(), 0, 0, 1).
+            rotate(this.transform.rotation.y(), 0, 1, 0).
+            rotate(this.transform.rotation.x(), 1, 0, 0);
     }
 
     getLocation() {
@@ -116,10 +125,13 @@ class Mesh extends Actor {
      */
     bulidMMatrix() {
         this.updateMatrics();
+        
         this.mMatrix.setTranslate(this.transform.location.x(), this.transform.location.y(), this.transform.location.z()).
-            rotate(this.transform.rotation.x(), 1, 0, 0).rotate(this.transform.rotation.y(), 0, 1, 0).rotate(this.transform.rotation.z(), 0, 0, 1).
+            multiply(this.rotateMatrix).
             scale(this.transform.scale.x(), this.transform.scale.y(), this.transform.scale.z());
         this.mIMatrix.setInverseOf(this.mMatrix);
+
+        console.log(this.getRotation().x(), this.getRotation().y(), this.getRotation().z());
     }
 }
 
@@ -243,9 +255,8 @@ class Camera extends Actor {
 
     bulidVPMatrix() {
         this.updateMatrics();
-        let rotateMatrix = new Matrix4().setRotate(this.transform.rotation.x(), 1, 0, 0).rotate(this.transform.rotation.y(), 0, 1, 0).rotate(this.transform.rotation.z(), 0, 0, 1);
-        let lookVec = rotateMatrix.multiplyVector3(new Vector3([0, 0, -1]));
-        let upVec = rotateMatrix.multiplyVector3(new Vector3([0, 1, 0]));
+        let lookVec = this.rotateMatrix.multiplyVector3(new Vector3([0, 0, -1]));
+        let upVec = this.rotateMatrix.multiplyVector3(new Vector3([0, 1, 0]));
 
         this.vpMatrix.setPerspective(this.FOV, width / height, this.nearClip, this.farClip).
             lookAt(
@@ -257,6 +268,22 @@ class Camera extends Actor {
 
 class simpleRotateCamera extends Camera {
     constructor(lookAtPoint = new Vector3([0, 0, 0]), distance = 6, FOV = 60, nearClip = 0.1, farClip = 100) {
-        
+        super(new Transform(new Vector3([0, 0, 0]), new Vector3([-20, 0, 0])), FOV, nearClip, farClip);
+        this.lookAtPoint = lookAtPoint;
+        this.distance = distance;
+    }
+
+    bulidVPMatrix() {
+        this.updateMatrics();
+        let backVec = this.getForwardVector().multiplyf(-1 * this.distance);
+        let eyePoint = this.getLocation().add(backVec);
+        let upVec = this.rotateMatrix.multiplyVector3(new Vector3([0, 1, 0]));
+
+        this.vpMatrix.setPerspective(this.FOV, width / height, this.nearClip, this.farClip).
+            lookAt(
+                eyePoint.x(), eyePoint.y(), eyePoint.z(),
+                this.getLocation().x(), this.getLocation().y(), this.getLocation().z(),
+                upVec.x(), upVec.y(), upVec.z()
+            );
     }
 }
