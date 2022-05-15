@@ -1,12 +1,22 @@
 'use strict';
 const canvas = document.querySelector('canvas');
-if (!canvas) {
-    console.console.error('获取Canvas失败');
-}
 const gl = getWebGLContext(canvas);
-if (!gl) {
-    console.error("Get WebGL Render Context Failed");
+let initCanvasAndWebGL = function () {
+    if (!canvas) {
+        console.console.error('获取Canvas失败');
+    }
+    canvas.bLeftMouse = false;
+    canvas.bRightMouse = false;
+    canvas.bMiddleMouse = false;
+    canvas.mouseX = 0.0;
+    canvas.mouseY = 0.0;
+    canvas.wheel = 0;
+
+    if (!gl) {
+        console.error("Get WebGL Render Context Failed");
+    }
 }
+initCanvasAndWebGL();
 
 let width = canvas.clientWidth;
 let height = canvas.clientHeight;
@@ -26,9 +36,7 @@ class WebGLRenderer {
 
         this.codeEditor.changeSize(window.innerWidth * this.codeEditor.sizePercent);
 
-        window.onresize = () => {
-            this.codeEditor.changeSize(window.innerWidth * this.codeEditor.sizePercent);
-        }
+        this.implementEvents();
     }
 
     start() {
@@ -60,6 +68,9 @@ class WebGLRenderer {
             this.lastTime = timeStamp;
 
             if (deltaSecond > 1) deltaSecond = 0.01;
+
+            this.scene.update(deltaSecond);
+
             this.customTick(deltaSecond);
 
             this.scene.calculateMatrices();
@@ -93,13 +104,67 @@ class WebGLRenderer {
         this.scene.clear();
     }
 
-    initWebGL() {
-        gl = getWebGLContext(canvas);
-        if (!gl) {
-            console.error("Get WebGL Render Context Failed");
+    implementEvents() {
+        // 禁用右键菜单
+        document.oncontextmenu = function(){
+            return false;
         }
+
+        window.onresize = () => {
+            this.codeEditor.changeSize(window.innerWidth * this.codeEditor.sizePercent);
+        }
+
+        canvas.addEventListener('mousemove', (ev) => {
+            canvas.mouseX = ev.offsetX;
+            canvas.mouseY = ev.offsetY;
+        })
+        canvas.addEventListener('mousedown', (ev) => {
+            switch (ev.button) {
+                // 左键
+                case 0:
+                    canvas.bLeftMouse = true;
+                    break;
+                // 中键
+                case 1:
+                    canvas.bMiddleMouse = true;
+                    break;
+                // 右键
+                case 2:
+                    canvas.bRightMouse = true;
+                    break;
+                default:
+                    console.warn('mousedown事件返回值button值错误：', ev.button);
+                    break;
+            }
+        })
+        canvas.addEventListener('mouseup', (ev) => {
+            switch (ev.button) {
+                // 左键
+                case 0:
+                    canvas.bLeftMouse = false;
+                    break;
+                // 中键
+                case 1:
+                    canvas.bMiddleMouse = false;
+                    break;
+                // 右键
+                case 2:
+                    canvas.bRightMouse = false;
+                    break;
+                default:
+                    console.warn('mouseup事件返回值button值错误：', ev.button);
+                    break;
+            }
+        })
+        canvas.addEventListener('mouseleave', (ev) => {
+            canvas.bLeftMouse = false;
+            canvas.bRightMouse = false;
+            canvas.bMiddleMouse = false;
+        })
     }
 }
+
+
 
 let CODE_TYPE = {
     JS: Symbol(0),

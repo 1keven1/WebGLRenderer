@@ -90,6 +90,16 @@ class Scene {
         }
     }
 
+    update(deltaSecond){
+        this.meshList.forEach((mesh, index, arr) =>{
+            mesh.update(deltaSecond);
+        })
+        this.lightList.forEach((light, index, arr) =>{
+            light.update(deltaSecond);
+        })
+        this.camera.update(deltaSecond);
+    }
+
     calculateMatrices() {
         // 计算Mesh的M矩阵
         this.meshList.forEach((mesh, index, arr) => {

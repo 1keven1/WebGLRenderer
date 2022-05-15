@@ -21,17 +21,22 @@ class Actor {
     constructor(transform = new Transform()) {
         this.transform = transform;
 
-        this.rotateMatrix = new Matrix4();
+        this.rotationMatrix = new Matrix4();
 
     }
+
+    update(deltaSecond) { }
 
     updateMatrics() {
         if (this.getRotation().x() > 360) this.transform.rotation.substract(new Vector3([360, 0, 0]));
         if (this.getRotation().y() > 360) this.transform.rotation.substract(new Vector3([0, 360, 0]));
         if (this.getRotation().z() > 360) this.transform.rotation.substract(new Vector3([0, 0, 360]));
+        if (this.getRotation().x() < 0) this.transform.rotation.add(new Vector3([360, 0, 0]));
+        if (this.getRotation().y() < 0) this.transform.rotation.add(new Vector3([0, 360, 0]));
+        if (this.getRotation().z() < 0) this.transform.rotation.add(new Vector3([0, 0, 360]));
 
         // 构建旋转矩阵 顺规为ZYX
-        this.rotateMatrix.setRotate(this.transform.rotation.z(), 0, 0, 1).
+        this.rotationMatrix.setRotate(this.transform.rotation.z(), 0, 0, 1).
             rotate(this.transform.rotation.y(), 0, 1, 0).
             rotate(this.transform.rotation.x(), 1, 0, 0);
     }
@@ -74,16 +79,16 @@ class Actor {
     }
 
     getRotateMatrix() {
-        return this.rotateMatrix;
+        return this.rotationMatrix;
     }
 
     getForwardVector() {
-        return this.rotateMatrix.multiplyVector3(new Vector3([0, 0, -1]));
+        return this.rotationMatrix.multiplyVector3(new Vector3([0, 0, -1]));
     }
 
     getUpVector() {
         let rotateMatrix = this.getRotateMatrix();
-        return this.rotateMatrix.multiplyVector3(new Vector3([0, 1, 0]));
+        return this.rotationMatrix.multiplyVector3(new Vector3([0, 1, 0]));
     }
 }
 
@@ -125,13 +130,11 @@ class Mesh extends Actor {
      */
     bulidMMatrix() {
         this.updateMatrics();
-        
+
         this.mMatrix.setTranslate(this.transform.location.x(), this.transform.location.y(), this.transform.location.z()).
-            multiply(this.rotateMatrix).
+            multiply(this.rotationMatrix).
             scale(this.transform.scale.x(), this.transform.scale.y(), this.transform.scale.z());
         this.mIMatrix.setInverseOf(this.mMatrix);
-
-        console.log(this.getRotation().x(), this.getRotation().y(), this.getRotation().z());
     }
 }
 
@@ -255,8 +258,8 @@ class Camera extends Actor {
 
     bulidVPMatrix() {
         this.updateMatrics();
-        let lookVec = this.rotateMatrix.multiplyVector3(new Vector3([0, 0, -1]));
-        let upVec = this.rotateMatrix.multiplyVector3(new Vector3([0, 1, 0]));
+        let lookVec = this.rotationMatrix.multiplyVector3(new Vector3([0, 0, -1]));
+        let upVec = this.rotationMatrix.multiplyVector3(new Vector3([0, 1, 0]));
 
         this.vpMatrix.setPerspective(this.FOV, width / height, this.nearClip, this.farClip).
             lookAt(
@@ -266,18 +269,88 @@ class Camera extends Actor {
     }
 }
 
-class simpleRotateCamera extends Camera {
+class SimpleRotateCamera extends Camera {
     constructor(lookAtPoint = new Vector3([0, 0, 0]), distance = 6, FOV = 60, nearClip = 0.1, farClip = 100) {
-        super(new Transform(new Vector3([0, 0, 0]), new Vector3([-20, 0, 0])), FOV, nearClip, farClip);
+        super(new Transform(new Vector3([0, 0, 0]), new Vector3([0, 0, 0])), FOV, nearClip, farClip);
         this.lookAtPoint = lookAtPoint;
         this.distance = distance;
+
+        this.pitchSpeed = 1;
+        this.yawSpeed = 1;
+        this.zoomSpeed = 0.1;
+
+        this.yaw = 0;
+        this.pitch = 20;
+        this.pitchMin = -80;
+        this.pitchMax = 80;
+        this.distanceMin = 2;
+        this.distanceMax = 10;
+
+        this.mouseLastX = 0.0;
+        this.mouseLastY = 0.0;
+
+        canvas.addEventListener('wheel', (ev) => {
+            this.distance += ev.deltaY * 0.01;
+            // 限制距离
+            this.distance = clamp(this.distance, this.distanceMin, this.distanceMax);
+        })
+    }
+
+    // 重写Update
+    update(deltaSecond) {
+        // 如果啥都没按直接返回
+        if (!canvas.bLeftMouse && !canvas.bMiddleMouse && !canvas.bRightMouse) {
+            this.mouseLastX = 0.0;
+            this.mouseLastY = 0.0;
+            return;
+        }
+
+        let ddX, ddY;
+        // 如果是第一次按 赋值直接返回
+        if (this.mouseLastX === 0 && this.mouseLastY === 0) {
+            this.mouseLastX = canvas.mouseX;
+            this.mouseLastY = canvas.mouseY;
+            return;
+        }
+        // 如果不是 则计算鼠标DDX和XXY
+        else {
+            ddX = canvas.mouseX - this.mouseLastX;
+            ddY = canvas.mouseY - this.mouseLastY;
+            this.mouseLastX = canvas.mouseX;
+            this.mouseLastY = canvas.mouseY;
+        }
+
+        // 如果按了左键 就旋转视角
+        if (canvas.bLeftMouse) {
+            this.yaw += ddX * deltaSecond * this.yawSpeed * -1;
+            this.pitch += ddY * deltaSecond * this.pitchSpeed;
+
+            // 限制俯仰角度
+            if(this.pitch > this.pitchMax) this.pitch = this.pitchMax;
+            if(this.pitch < this.pitchMin) this.pitch = this.pitchMin;
+        }
+
+        // 如果按了右键 就前后移动
+        if(canvas.bRightMouse) {
+            this.distance += ddY * deltaSecond * this.zoomSpeed * -1;
+            // 限制距离
+            this.distance = clamp(this.distance, this.distanceMin, this.distanceMax);
+        }
+    }
+
+    // 重写updateMatrix
+    updateMatrics() {
+        if (this.yaw >= 360) this.yaw -= 360;
+        if (this.yaw <= 0) this.yaw += 360;
+
+        this.rotationMatrix.setRotate(this.yaw, 0, 1, 0).rotate(this.pitch * -1, 1, 0, 0);
     }
 
     bulidVPMatrix() {
         this.updateMatrics();
         let backVec = this.getForwardVector().multiplyf(-1 * this.distance);
         let eyePoint = this.getLocation().add(backVec);
-        let upVec = this.rotateMatrix.multiplyVector3(new Vector3([0, 1, 0]));
+        let upVec = this.rotationMatrix.multiplyVector3(new Vector3([0, 1, 0]));
 
         this.vpMatrix.setPerspective(this.FOV, width / height, this.nearClip, this.farClip).
             lookAt(
