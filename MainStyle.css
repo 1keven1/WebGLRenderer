@@ -55,3 +55,21 @@ canvas {
 ::-webkit-scrollbar-corner {
     background: hsl(270, 10%, 24%);
 }
+
+/* 阿里巴巴iconfont引用 */
+@font-face {
+    font-family: 'iconfont';
+    /* Project id 3404324 */
+    src: url('//at.alicdn.com/t/font_3404324_3ebo13w1b0m.woff2?t=1652707067768') format('woff2'),
+        url('//at.alicdn.com/t/font_3404324_3ebo13w1b0m.woff?t=1652707067768') format('woff'),
+        url('//at.alicdn.com/t/font_3404324_3ebo13w1b0m.ttf?t=1652707067768') format('truetype');
+}
+
+.iconfont {
+    font-family: "iconfont" !important;
+    font-size: 16px;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-stroke-width: 2px;
+    -moz-osx-font-smoothing: grayscale;
+}

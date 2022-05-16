@@ -35,7 +35,7 @@ this.bulidScene = (scene) =>
     scene.camera = simpleCamera;
 }
 
-// 在运行时执行一次
+// 在运行前执行一次
 this.customBeginPlay = () =>
 {
     meshCube.setRotation(new Vector3([0.0, 0.0, 0.0]));

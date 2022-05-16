@@ -34,7 +34,7 @@ class WebGLRenderer {
         this.codeEditor = new CodeEditor(this);
         this.clearColor = [0.0, 0.0, 0.0, 1.0];
 
-        this.codeEditor.changeSize(window.innerWidth * this.codeEditor.sizePercent);
+        // this.codeEditor.changeSize(window.innerWidth * this.codeEditor.sizePercent);
 
         this.implementEvents();
     }
@@ -106,12 +106,12 @@ class WebGLRenderer {
 
     implementEvents() {
         // 禁用右键菜单
-        document.oncontextmenu = function(){
+        document.oncontextmenu = function () {
             return false;
         }
 
         window.onresize = () => {
-            this.codeEditor.changeSize(window.innerWidth * this.codeEditor.sizePercent);
+            this.codeEditor.changeSize(window.innerWidth * this.codeEditor.sizePercent * this.codeEditor.multi);
         }
 
         canvas.addEventListener('mousemove', (ev) => {
@@ -194,7 +194,11 @@ class CodeEditor {
         this.applyButton = this.codeEditor.querySelector('.apply-code');
         this.resizeHandler = this.codeEditor.querySelector('.resize-handler');
         this.choise = -1;
+
         this.visability = false;
+        this.changeSize(this.visability ? window.innerWidth * this.sizePercent : 0, false);
+        this.multi = this.visability ? 1 : 0;
+        this.goal = 0;
 
         this.implementEvents();
     }
@@ -202,7 +206,7 @@ class CodeEditor {
     implementEvents() {
         // 切换代码显示
         this.toogleCode.addEventListener('click', () => {
-            this.setVisability(!this.visability);
+            this.setVisabilityAnimate(!this.visability);
         })
 
         // 确定按钮
@@ -346,14 +350,14 @@ class CodeEditor {
     }
 
     changeSize(w, clamp = true) {
-        if (!this.visability) {
-            this.codeEditor.style.width = 0 + 'px';
-            height = canvas.clientHeight;
-            width = canvas.clientWidth;
-            canvas.height = height;
-            canvas.width = width;
-            return;
-        }
+        // if (!this.visability) {
+        //     this.codeEditor.style.width = 0 + 'px';
+        //     height = canvas.clientHeight;
+        //     width = canvas.clientWidth;
+        //     canvas.height = height;
+        //     canvas.width = width;
+        //     return;
+        // }
         if (clamp) {
             if (w > window.innerWidth * 0.9) w = window.innerWidth * 0.9;
             if (w < window.innerWidth * 0.1) w = window.innerWidth * 0.1;
@@ -374,6 +378,25 @@ class CodeEditor {
         else {
             this.changeSize(0, false);
         }
+    }
+
+    setVisabilityAnimate(visability, animSpeed = 15) {
+        if (this.visability === visability) return;
+        this.visability = visability;
+        this.goal = visability ? 1 : 0;
+
+        if(this.multi !==0 && this.multi !== 1) return;
+
+        let anim = setInterval(() => {
+            this.multi = fInterpTo(this.multi, this.goal, 1 / 60, animSpeed);
+
+            this.changeSize(window.innerWidth * this.sizePercent * this.multi, false);
+
+            if (this.multi === this.goal) {
+                clearInterval(anim);
+                anim = null;
+            }
+        }, 1000 / 60);
     }
 }
 
