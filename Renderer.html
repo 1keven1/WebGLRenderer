@@ -11,7 +11,14 @@
 <body>
     <div class="layout">
         <div class="renderer">
-            <canvas>请使用支持Canvas的浏览器</canvas>
+            <canvas class="gl-canvas">请使用支持Canvas的浏览器</canvas>
+            <!-- <canvas class="hud-canvas" style="z-index: 1;">请使用支持Canvas的浏览器</canvas> -->
+            <div class="hud">
+                <div class="center-hud">
+                    <div class='iconfont'>&#xe8fc;</div>
+                    <div class='text'>加载中···</div>
+                </div>
+            </div>
         </div>
 
         <section class="code-editor">

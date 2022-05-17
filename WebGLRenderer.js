@@ -1,5 +1,5 @@
 'use strict';
-const canvas = document.querySelector('canvas');
+const canvas = document.querySelector('.gl-canvas');
 const gl = getWebGLContext(canvas);
 let initCanvasAndWebGL = function () {
     if (!canvas) {
@@ -17,6 +17,8 @@ let initCanvasAndWebGL = function () {
     }
 }
 initCanvasAndWebGL();
+// const hud = document.querySelector('.hud-canvas');
+// const ctx = hud.getContext('2d');
 
 let width = canvas.clientWidth;
 let height = canvas.clientHeight;
@@ -32,9 +34,8 @@ class WebGLRenderer {
         this.customJS = null;
         this.frameRequest = null;
         this.codeEditor = new CodeEditor(this);
+        this.hud = new HUD(this);
         this.clearColor = [0.0, 0.0, 0.0, 1.0];
-
-        // this.codeEditor.changeSize(window.innerWidth * this.codeEditor.sizePercent);
 
         this.implementEvents();
     }
@@ -46,6 +47,7 @@ class WebGLRenderer {
 
         this.bulidScene(this.scene);
         // 加载场景
+        this.hud.changeLoadState(LOAD_STATE.LOADING);
         this.scene.loadOver = this.startRenderLoop.bind(this);
         this.scene.load();
     }
@@ -57,6 +59,7 @@ class WebGLRenderer {
     bulidScene(scene) { }
 
     startRenderLoop() {
+        this.hud.changeLoadState(LOAD_STATE.FINISH);
         this.codeEditor.refresh();
 
         this.customBeginPlay();
@@ -75,6 +78,8 @@ class WebGLRenderer {
 
             this.scene.calculateMatrices();
             this.scene.render(this.clearColor);
+
+            // this.drawHUD();
             this.frameRequest = requestAnimationFrame(renderLoop);
         }
         renderLoop(0);
@@ -111,7 +116,7 @@ class WebGLRenderer {
         }
 
         window.onresize = () => {
-            this.codeEditor.changeSize(window.innerWidth * this.codeEditor.sizePercent * this.codeEditor.multi);
+            this.codeEditor.changeSize(window.innerWidth * this.codeEditor.sizePercent * this.codeEditor.multi, false);
         }
 
         canvas.addEventListener('mousemove', (ev) => {
@@ -161,6 +166,23 @@ class WebGLRenderer {
             canvas.bRightMouse = false;
             canvas.bMiddleMouse = false;
         })
+    }
+
+    drawHUD() {
+        ctx.clearRect(0, 0, 400, 400);
+        // 绘制三角形
+        ctx.beginPath();
+        ctx.moveTo(120, 10);
+        ctx.lineTo(200, 150);
+        ctx.lineTo(40, 150);
+        ctx.closePath();
+        ctx.strokeStyle = 'rgba(255, 100, 255, 1)';
+        ctx.stroke();
+        // 绘制字体
+        ctx.font = '18px "Times New Roman"';
+        ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+        ctx.fillText('This is a hud', 40, 180);
+        ctx.fillText('Current Angle: ' + Math.floor(100), 40, 200);
     }
 }
 
@@ -385,7 +407,7 @@ class CodeEditor {
         this.visability = visability;
         this.goal = visability ? 1 : 0;
 
-        if(this.multi !==0 && this.multi !== 1) return;
+        if (this.multi !== 0 && this.multi !== 1) return;
 
         let anim = setInterval(() => {
             this.multi = fInterpTo(this.multi, this.goal, 1 / 60, animSpeed);
@@ -400,3 +422,50 @@ class CodeEditor {
     }
 }
 
+let LOAD_STATE = {
+    LOADING: Symbol(0),
+    FINISH: Symbol(1),
+    FAIL: Symbol(2)
+}
+Object.freeze(LOAD_STATE);
+
+class HUD {
+    constructor(renderer) {
+        this.renderer = renderer;
+
+        this.visability = true;
+        this.hud = document.querySelector('.hud');
+
+        this.centerHud = this.hud.querySelector('.center-hud');
+        this.centerHud.icon = this.centerHud.querySelector('.iconfont');
+        this.centerHud.text = this.centerHud.querySelector('.text');
+        this.centerHud.visability = false;
+    }
+
+    changeLoadState(loadState){
+        switch(loadState){
+            case LOAD_STATE.LOADING:
+                this.setCenterHubVisability(true);
+                break;
+            case LOAD_STATE.FINISH:
+                this.setCenterHubVisability(false);
+                break;
+            case LOAD_STATE.FAIL:
+                break;
+            default:
+                break;
+        }
+    }
+
+    setVisability(visability){
+        if (this.visability === visability) return;
+        this.visability = visability;
+        // TODO
+    }
+
+    setCenterHubVisability(visability){
+        if (this.centerHud.visability === visability) return;
+        this.centerHud.visability = visability;
+        this.centerHud.style.display = visability ? 'flex' : 'none';
+    }
+}
