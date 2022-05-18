@@ -336,6 +336,7 @@ class SimpleRotateCamera extends Camera {
             // 限制距离
             this.distance = clamp(this.distance, this.distanceMin, this.distanceMax);
         }
+
     }
 
     // 重写updateMatrix
@@ -349,13 +350,14 @@ class SimpleRotateCamera extends Camera {
     bulidVPMatrix() {
         this.updateMatrics();
         let backVec = this.getForwardVector().multiplyf(-1 * this.distance);
-        let eyePoint = this.getLocation().add(backVec);
+        let eyePoint = this.lookAtPoint.copy().add(backVec);
+        this.setLocation(eyePoint);
         let upVec = this.rotationMatrix.multiplyVector3(new Vector3([0, 1, 0]));
 
         this.vpMatrix.setPerspective(this.FOV, width / height, this.nearClip, this.farClip).
             lookAt(
                 eyePoint.x(), eyePoint.y(), eyePoint.z(),
-                this.getLocation().x(), this.getLocation().y(), this.getLocation().z(),
+                this.lookAtPoint.x(), this.lookAtPoint.y(), this.lookAtPoint.z(),
                 upVec.x(), upVec.y(), upVec.z()
             );
     }

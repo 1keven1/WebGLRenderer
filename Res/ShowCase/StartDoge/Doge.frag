@@ -8,17 +8,26 @@ precision mediump float;
 #endif
 #endif
 
+uniform mat4 u_Matrix_M;
 uniform mat4 u_Matrix_M_I;
 uniform mat4 u_Matrix_MVP;
 uniform vec4 u_LightPos;
 uniform vec4 u_LightColor;
+uniform vec4 u_CameraPos;
+uniform mat4 u_Matrix_Light;
+
 uniform sampler2D u_ShadowMap;
 
 uniform vec3 u_AmbientColor;
-uniform sampler2D u_Texture;
+uniform sampler2D u_TexBC;
+uniform sampler2D u_TexN;
 
 varying vec2 v_TexCoord;
 varying vec3 v_WorldNormal;
+varying vec3 v_WorldTangent;
+varying vec3 v_WorldBinormal;
+varying vec3 v_viewDir;
+
 varying vec4 v_PositionFromLight;
 
 float unpackDepth(const in vec4 rgbaDepth) {
@@ -27,7 +36,7 @@ float unpackDepth(const in vec4 rgbaDepth) {
     return depth;
 }
 
-// 获取阴影函数
+// 获得阴影
 float getShadow() {
     vec3 shadowCoord = (v_PositionFromLight.xyz / v_PositionFromLight.w) / 2.0 + 0.5;
     vec4 rgbaDepth = texture2D(u_ShadowMap, shadowCoord.xy);
@@ -38,16 +47,34 @@ float getShadow() {
 
 // Main函数在这里
 void main() {
-    vec3 albedo = texture2D(u_Texture, v_TexCoord.xy).xyz;
+    vec2 uv = v_TexCoord;
 
+    // 法线
     vec3 worldNormal = normalize(v_WorldNormal);
+    vec3 worldTangent = normalize(v_WorldTangent);
+    vec3 WorldBinormal = normalize(v_WorldBinormal);
+    vec3 tangentNormal = texture2D(u_TexN, uv).xyz * vec3(2) - vec3(1);
+    tangentNormal.xy *= 0.7;
+    vec3 finalNormal = normalize(vec3(tangentNormal.x) * worldTangent + vec3(-tangentNormal.y) * WorldBinormal + vec3(tangentNormal.z) * worldNormal);
+
+    // 漫反射
+    vec3 albedo = texture2D(u_TexBC, uv).xyz;
     vec3 lightDir = normalize(u_LightPos.xyz);
-    float nDotL = max(0.0, dot(worldNormal, lightDir));
+    float nDotL = max(0.0, dot(finalNormal, lightDir));
     vec3 diffuse = albedo * nDotL * u_LightColor.xyz;
+
+    // 高光
+    vec3 viewDir = normalize(v_viewDir);
+    vec3 halfVec = normalize(lightDir + viewDir);
+    float nDotH = max(0.0, dot(finalNormal, halfVec));
+    nDotH = pow(nDotH, 8.0);
+    nDotH = smoothstep(0.8, 1.0, nDotH);
+    vec3 specular = nDotH * u_LightColor.xyz * 0.1;
+
     vec3 ambient = u_AmbientColor.xyz * albedo;
 
     float shadow = getShadow();
 
-    vec3 finalColor = diffuse * shadow + ambient;
+    vec3 finalColor = (diffuse + specular) * shadow + ambient;
     gl_FragColor = vec4(finalColor, 1);
 }

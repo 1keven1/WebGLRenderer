@@ -19,6 +19,7 @@ uniform mat4 u_Matrix_Light;
 uniform sampler2D u_ShadowMap;
 
 uniform vec3 u_AmbientColor;
+uniform sampler2D u_TexBC;
 
 varying vec2 v_TexCoord;
 varying vec3 v_WorldNormal;
@@ -45,7 +46,9 @@ float getShadow() {
 
 // Main函数在这里
 void main() {
-    vec3 albedo = vec3(0.5, 0.5, 0.5);
+    vec2 uv = v_TexCoord;
+
+    vec3 albedo = texture2D(u_TexBC, uv).xyz;
 
     vec3 worldNormal = normalize(v_WorldNormal);
     vec3 lightDir = normalize(u_LightPos.xyz);

@@ -120,9 +120,9 @@ class WebGLRenderer {
         }
 
         canvas.addEventListener('mousemove', (ev) => {
-            canvas.mouseX = ev.offsetX;
-            canvas.mouseY = ev.offsetY;
-        })
+            canvas.mouseX = ev.clientX;
+            canvas.mouseY = ev.clientY;
+        });
         canvas.addEventListener('mousedown', (ev) => {
             switch (ev.button) {
                 // 左键
@@ -141,7 +141,7 @@ class WebGLRenderer {
                     console.warn('mousedown事件返回值button值错误：', ev.button);
                     break;
             }
-        })
+        });
         canvas.addEventListener('mouseup', (ev) => {
             switch (ev.button) {
                 // 左键
@@ -160,12 +160,24 @@ class WebGLRenderer {
                     console.warn('mouseup事件返回值button值错误：', ev.button);
                     break;
             }
-        })
+        });
         canvas.addEventListener('mouseleave', (ev) => {
             canvas.bLeftMouse = false;
             canvas.bRightMouse = false;
             canvas.bMiddleMouse = false;
-        })
+        });
+        canvas.addEventListener('touchstart', (ev) => {
+            canvas.mouseX = ev.touches[0].clientX;
+            canvas.mouseY = ev.touches[0].clientY;
+            canvas.bLeftMouse = true;
+        });
+        canvas.addEventListener('touchend', (ev) => {
+            canvas.bLeftMouse = false;
+        });
+        canvas.addEventListener('touchmove', (ev) => {
+            canvas.mouseX = ev.touches[0].clientX;
+            canvas.mouseY = ev.touches[0].clientY;
+        });
     }
 
     drawHUD() {
@@ -215,9 +227,12 @@ class CodeEditor {
         this.panelContainer = this.codeEditor.querySelector('.panels');
         this.applyButton = this.codeEditor.querySelector('.apply-code');
         this.resizeHandler = this.codeEditor.querySelector('.resize-handler');
-        this.choise = -1;
 
         this.visability = false;
+        this.resizeHandler.holding = false;
+        this.resizeHandler.bActive = this.visability;
+        this.choise = -1;
+
         this.changeSize(this.visability ? window.innerWidth * this.sizePercent : 0, false);
         this.multi = this.visability ? 1 : 0;
         this.goal = 0;
@@ -254,15 +269,18 @@ class CodeEditor {
 
         // resize操作
         this.resizeHandler.addEventListener('mousedown', (ev) => {
+            if(!this.resizeHandler.bActive) return;
             this.resizeHandler.holding = true;
             this.panelContainer.blur();
         })
 
         document.addEventListener('mouseup', (ev) => {
+            if (!this.resizeHandler.bActive) return;
             this.resizeHandler.holding = false;
         })
 
         document.addEventListener('mousemove', (ev) => {
+            if (!this.resizeHandler.bActive) return;
             if (this.resizeHandler.holding) {
                 let w = window.innerWidth - ev.clientX;
                 this.sizePercent = w / window.innerWidth;
@@ -286,6 +304,7 @@ class CodeEditor {
         this.chooseTab(this.tabs[0]);
 
         this.setVisability(this.visability);
+
     }
 
     removeTabs() {
@@ -394,6 +413,8 @@ class CodeEditor {
     setVisability(visability) {
         if (this.visability === visability) return;
         this.visability = visability;
+        this.resizeHandler.holding = false;
+        this.resizeHandler.bActive = visability;
         if (visability) {
             this.changeSize(window.innerWidth * this.sizePercent);
         }
@@ -405,6 +426,9 @@ class CodeEditor {
     setVisabilityAnimate(visability, animSpeed = 15) {
         if (this.visability === visability) return;
         this.visability = visability;
+        this.resizeHandler.holding = false;
+        this.resizeHandler.bActive = visability;
+
         this.goal = visability ? 1 : 0;
 
         if (this.multi !== 0 && this.multi !== 1) return;
@@ -442,8 +466,8 @@ class HUD {
         this.centerHud.visability = false;
     }
 
-    changeLoadState(loadState){
-        switch(loadState){
+    changeLoadState(loadState) {
+        switch (loadState) {
             case LOAD_STATE.LOADING:
                 this.setCenterHubVisability(true);
                 break;
@@ -457,13 +481,12 @@ class HUD {
         }
     }
 
-    setVisability(visability){
+    setVisability(visability) {
         if (this.visability === visability) return;
         this.visability = visability;
-        // TODO
     }
 
-    setCenterHubVisability(visability){
+    setCenterHubVisability(visability) {
         if (this.centerHud.visability === visability) return;
         this.centerHud.visability = visability;
         this.centerHud.style.display = visability ? 'flex' : 'none';

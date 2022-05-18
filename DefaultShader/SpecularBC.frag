@@ -19,6 +19,7 @@ uniform mat4 u_Matrix_Light;
 uniform sampler2D u_ShadowMap;
 
 uniform vec3 u_AmbientColor;
+uniform sampler2D u_TexBC;
 
 varying vec2 v_TexCoord;
 varying vec3 v_WorldNormal;
@@ -45,16 +46,25 @@ float getShadow() {
 
 // Main函数在这里
 void main() {
-    vec3 albedo = vec3(0.5, 0.5, 0.5);
+    vec2 uv = v_TexCoord;
+
+    vec3 albedo = texture2D(u_TexBC, uv).xyz;
 
     vec3 worldNormal = normalize(v_WorldNormal);
     vec3 lightDir = normalize(u_LightPos.xyz);
     float nDotL = max(0.0, dot(worldNormal, lightDir));
     vec3 diffuse = albedo * nDotL * u_LightColor.xyz;
+
+    // 高光
+    vec3 viewDir = normalize(v_viewDir);
+    vec3 halfVec = normalize(lightDir + viewDir);
+    float nDotH = max(0.0, dot(worldNormal, halfVec));
+    vec3 specular = pow(nDotH, 128.0) * u_LightColor.xyz;
+
     vec3 ambient = u_AmbientColor.xyz * albedo;
 
     float shadow = getShadow();
 
-    vec3 finalColor = diffuse * shadow + ambient;
+    vec3 finalColor = (diffuse + specular) * shadow + ambient;
     gl_FragColor = vec4(finalColor, 1);
 }
