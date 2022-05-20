@@ -1,0 +1,17 @@
+setVector4f和3f的TODO
+先换成textarea
+研究MipMap
+环境光为场景限定
+CubeMap
+添加展示框
+Shader添加编译错误指示
+显示帧率
+实现半透明
+优化竖屏
+多光源
+点光源支持
+图像处理blit函数
+后期处理
+加载时显示在加载什么
+
+

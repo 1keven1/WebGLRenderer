@@ -1,10 +1,25 @@
 'use strict';
 const SMALL_NUMBER = 1e-8;
 
+/**
+ * 将输入值钳制在上下限之间
+ * @param {Number} float 输入数据
+ * @param {Number} min 下限
+ * @param {Number} max 上限
+ * @returns 钳制后的值
+ */
 let clamp = function (float, min = 0, max = 1) {
     return (float < min) ? min : (float < max) ? float : max;
 }
 
+/**
+ * 对浮点数向目标值进行平滑差值 距离越近速度越慢
+ * @param {Number} current 当前值
+ * @param {Number} target 目标值
+ * @param {Number} deltaSecond 世界Delta Time
+ * @param {Number} interpSpeed 插值速度
+ * @returns 下一帧的值
+ */
 let fInterpTo = function (current, target, deltaSecond, interpSpeed) {
     if (interpSpeed <= 0.0) return target;
 
@@ -62,7 +77,10 @@ Vector3.prototype.copy = function () {
 }
 
 
-
+/**
+ * 复制一份Transform出来
+ * @returns 复制出的Transform
+ */
 Transform.prototype.copy = function () {
     let newTrans = new Transform(this.location.copy(), this.rotation.copy(), this.scale.copy());
     return newTrans;

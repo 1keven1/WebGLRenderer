@@ -5,7 +5,10 @@ function Transform(location = new Vector3([0, 0, 0]), rotation = new Vector3([0,
     this.scale = scale;
 }
 
-let LIGHT_TYPE = {
+/**
+ * @enum
+ */
+const LIGHT_TYPE = {
     DIRECTIONAL: Symbol(0),
     POINT: Symbol(1),
     SPOT: Symbol(2)
@@ -14,9 +17,9 @@ Object.freeze(LIGHT_TYPE);
 
 class Actor {
     /**
-     * 
+     * Actor是可以放置在世界中的物体的基类
      * @constructor
-     * @param {Transform} transform 
+     * @param {Transform} transform 变换
      */
     constructor(transform = new Transform()) {
         this.transform = transform;
@@ -41,65 +44,121 @@ class Actor {
             rotate(this.transform.rotation.x(), 1, 0, 0);
     }
 
+    /**
+     * 返回位移信息
+     * @returns {Vector3} 位移的拷贝
+     */
     getLocation() {
         return this.transform.location.copy();
     }
 
+    /**
+     * 返回旋转信息
+     * @returns {Vector3} 旋转的拷贝
+     */
     getRotation() {
         return this.transform.rotation.copy();
     }
 
+    /**
+     * 返回缩放信息
+     * @returns {Vector3} 缩放的拷贝
+     */
     getScale() {
         return this.transform.scale.copy();
     }
 
+    /**
+     * 设置位置
+     * @param {Vector3} location 位置信息
+     */
     setLocation(location) {
         this.transform.location = location;
     }
 
+    /**
+     * 设置旋转值
+     * @param {Vector3} rotation 旋转信息
+     */
     setRotation(rotation) {
         this.transform.rotation = rotation;
     }
 
+    /**
+     * 设置位置和旋转值
+     * @param {Vector3} location 位置信息
+     * @param {Vector3} rotation 旋转信息
+     */
     setLocationAndRotation(location, rotation) {
         this.transform.location = location;
         this.transform.rotation = rotation;
     }
 
+    /**
+     * 设置缩放值
+     * @param {Vector3} scale 缩放信息
+     */
     setScale(scale) {
         this.transform.scale = scale;
     }
 
+    /**
+     * 添加位移偏移
+     * @param {Vector3} offset 位移偏移 
+     */
     addLocationOffset(offset) {
         this.transform.location.add(offset);
     }
 
+    /**
+     * 添加旋转偏移
+     * @param {Vector3} offset 旋转偏移
+     */
     addRotationOffset(offset) {
         this.transform.rotation.add(offset);
     }
 
+    /**
+     * 获取旋转矩阵
+     * @returns {Matrix4} 旋转矩阵
+     */
     getRotateMatrix() {
         return this.rotationMatrix;
     }
 
+    /**
+     * 获取向前向量
+     * @returns {Vector3} 向前向量
+     */
     getForwardVector() {
         return this.rotationMatrix.multiplyVector3(new Vector3([0, 0, -1]));
     }
 
+    /**
+     * 获取向上向量
+     * @returns {Vector3} 向上向量
+     */
     getUpVector() {
-        let rotateMatrix = this.getRotateMatrix();
         return this.rotationMatrix.multiplyVector3(new Vector3([0, 1, 0]));
+    }
+
+    /**
+     * 获取向右向量
+     * @returns {Vector3} 向右向量
+     */
+    getRightVector() {
+        return this.rotationMatrix.multiplyVector3(new Vector3([1, 0, 0]));
     }
 }
 
 class Mesh extends Actor {
     /**
-     * 
+     * 可以被渲染的Actor 有一个Model和一个Material
      * @constructor
-     * @param {Transform} transform 
-     * @param {Model} model 
-     * @param {Material} material 
-     * @param {Boolean} bCastShadow 
+     * @param {Transform} transform 变换
+     * @param {Model} model 模型
+     * @param {Material} material 材质
+     * @param {Boolean} bCastShadow 投射阴影
      */
     constructor(transform, model, material, bCastShadow = true) {
         super(transform);
@@ -111,17 +170,20 @@ class Mesh extends Actor {
         this.mIMatrix = new Matrix4();
     }
 
+    /**
+     * 设置是否投射阴影
+     * @param {boolean} bCastShadow 投射阴影
+     */
     setCastShadow(bCastShadow) {
         this.bCastShadow = bCastShadow;
     }
 
     /**
-     * 
-     * @param {Mesh} mesh 
+     * 复制一个相同的Mesh出来
+     * @returns {Mesh} 复制的Mesh
      */
     copy() {
         let newMesh = new Mesh(this.transform.copy(), this.model, this.material, this.bCastShadow);
-
         return newMesh;
     }
 
@@ -140,14 +202,14 @@ class Mesh extends Actor {
 
 class Light extends Actor {
     /**
-     * 
+     * 照亮场景的灯光 种类为LIGHT_TYPE 目前只实现了定向光
      * @constructor
      * @param {Transform} transform 变换 
      * @param {Vector3} lightColor 灯光颜色
      * @param {Number} intensity 强度
      * @param {LIGHT_TYPE} lightType 灯光类型
      */
-    constructor(transform, lightColor, intensity, lightType = LIGHT_TYPE.DIRECTIONAL) {
+    constructor(transform, lightColor = new Vector3([1, 1, 1]), intensity = 1, lightType = LIGHT_TYPE.DIRECTIONAL) {
         super(transform);
         this.lightColor = lightColor;
         this.intensity = intensity;
@@ -173,7 +235,6 @@ class Light extends Actor {
                     lookAt(this.transform.location.x(), this.transform.location.y(), this.transform.location.z(),
                         lookVec.x() + this.transform.location.x(), lookVec.y() + this.transform.location.y(), lookVec.z() + this.transform.location.z(),
                         upVec.x(), upVec.y(), upVec.z());
-                // console.log(this.vpMatrix);
                 break;
             case LIGHT_TYPE.POINT:
                 break;
@@ -247,6 +308,14 @@ class Light extends Actor {
 }
 
 class Camera extends Actor {
+    /**
+     * 最简单的渲染世界的摄像机
+     * @constructor
+     * @param {Transform} transform 变换
+     * @param {Number} FOV 视野角度
+     * @param {Number} nearClip 近剪裁平面
+     * @param {Number} farClip 远剪裁平面
+     */
     constructor(transform, FOV = 60, nearClip = 0.1, farClip = 100) {
         super(transform);
         this.FOV = FOV;
@@ -270,6 +339,15 @@ class Camera extends Actor {
 }
 
 class SimpleRotateCamera extends Camera {
+    /**
+     * 始终看向一点 并可以绕其旋转的相机
+     * @constructor
+     * @param {Vector3} lookAtPoint 看向的目标点
+     * @param {Number} distance 距目标点的距离
+     * @param {Number} FOV 视野角度
+     * @param {Number} nearClip 近剪裁平面
+     * @param {Number} farClip 远剪裁平面
+     */
     constructor(lookAtPoint = new Vector3([0, 0, 0]), distance = 6, FOV = 60, nearClip = 0.1, farClip = 100) {
         super(new Transform(new Vector3([0, 0, 0]), new Vector3([0, 0, 0])), FOV, nearClip, farClip);
         this.lookAtPoint = lookAtPoint;
@@ -326,12 +404,12 @@ class SimpleRotateCamera extends Camera {
             this.pitch += ddY * deltaSecond * this.pitchSpeed;
 
             // 限制俯仰角度
-            if(this.pitch > this.pitchMax) this.pitch = this.pitchMax;
-            if(this.pitch < this.pitchMin) this.pitch = this.pitchMin;
+            if (this.pitch > this.pitchMax) this.pitch = this.pitchMax;
+            if (this.pitch < this.pitchMin) this.pitch = this.pitchMin;
         }
 
         // 如果按了右键 就前后移动
-        if(canvas.bRightMouse) {
+        if (canvas.bRightMouse) {
             this.distance += ddY * deltaSecond * this.zoomSpeed * -1;
             // 限制距离
             this.distance = clamp(this.distance, this.distanceMin, this.distanceMax);

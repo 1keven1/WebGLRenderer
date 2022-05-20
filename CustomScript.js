@@ -55,5 +55,5 @@ this.customBeginPlay = () =>
 // 在运行时逐帧执行
 this.customTick = (deltaSecond) =>
 {
-    // doge.addRotationOffset(new Vector3([0, 1.5, 0]).multiplyf(deltaSecond));
+    doge.addRotationOffset(new Vector3([0, 1.5, 0]).multiplyf(deltaSecond));
 }

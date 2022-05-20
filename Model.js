@@ -25,6 +25,12 @@ let Face = function () {
 
 
 class Model {
+    /**
+     * 模型为Obj格式3D模型文件 目前只支持三角面
+     * @constructor
+     * @param {String} objFile Obj文件路径
+     * @param {Number} scale 模型缩放
+     */
     constructor(objFile, scale = 1) {
         this.objFile = objFile;
         this.objSource = null;
@@ -172,6 +178,9 @@ class Model {
         return face;
     }
 
+    /**
+     * 解码读取后的面数据 并存入WebGL Buffer
+     */
     decodeBufferArrays() {
         // Create an arrays for vertex coordinates, normals, colors, and indices
         let numIndices = this.faces.length * 3;
@@ -183,7 +192,7 @@ class Model {
         let tangents = new Float32Array(numVertices * 3);
         let indices = new Uint16Array(numIndices);
 
-        // Set vertex, normal and color
+        // 逐面解码
         let index_indices = 0;
         for (let i = 0; i < this.faces.length; i++) {
             let face = this.faces[i];
@@ -191,10 +200,10 @@ class Model {
             let faceTexCoords = [];
 
             for (let j = 0; j < 3; j++) {
-                // Set index
+                // 顶点序号
                 indices[index_indices] = index_indices;
 
-                // Copy vertex
+                // 顶点坐标
                 let vIndex = face.vIndex[j];
                 let vertex = this.vertices[vIndex];
                 faceVertices.push(vertex);
@@ -206,7 +215,7 @@ class Model {
                 else texCoord = new TexCoord(0, 0);
                 faceTexCoords.push(texCoord);
 
-                // Copy normal
+                // 法线
                 let nIdx = face.nIndex[j];
                 let normal = this.normals[nIdx];
 
@@ -249,6 +258,7 @@ class Model {
             tangents[((index_indices / 3) - 1) * 9 + 8] = tangent[2];
         }
 
+        // 全部解码完成后存入buffer
         this.vertexBuffer = this.createModelBuffer(gl.ARRAY_BUFFER, vertices, 3, gl.FLOAT, gl.STATIC_DRAW);
         this.texCoordBuffer = this.createModelBuffer(gl.ARRAY_BUFFER, texCoords, 2, gl.FLOAT, gl.STATIC_DRAW);
         this.normalBuffer = this.createModelBuffer(gl.ARRAY_BUFFER, normals, 3, gl.FLOAT, gl.STATIC_DRAW);

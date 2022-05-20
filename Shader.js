@@ -2,9 +2,9 @@
 class Shader
 {
     /**
-     * 
-     * @param {String} vShaderFile 
-     * @param {String} fShaderFile 
+     * 着色器 由顶点着色器和片元着色器文件组成
+     * @param {String} vShaderFile 顶点着色器路径
+     * @param {String} fShaderFile 片元着色器路径
      */
     constructor(vShaderFile, fShaderFile)
     {
@@ -99,7 +99,6 @@ class Shader
         this.vShaderSource = vSource;
         this.fShaderSource = fSource;
 
-        // console.log(this.fShaderFile);
         this.compileShader();
     }
 }

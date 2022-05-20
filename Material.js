@@ -6,6 +6,10 @@
 1500：蒙版
 2000：半透明 叠加
 */
+
+/**
+ * @enum
+ */
 const MATERIAL_TYPE = {
     OPAQUE: Symbol(0),
     MASKED: Symbol(1),
@@ -14,6 +18,10 @@ const MATERIAL_TYPE = {
 }
 Object.freeze(MATERIAL_TYPE);
 
+/**
+ * 剔除模式
+ * @enum
+ */
 const CULL_MODE = {
     BACK: Symbol(0),
     FRONT: Symbol(1),
@@ -32,11 +40,12 @@ Object.freeze(ATTRIBURE_TYPE);
 class Material
 {
     /**
-     * 
-     * @param {Shader} baseShader 
-     * @param {Shader} shadowCaster
-     * @param {MATERIAL_TYPE} materialType 
-     * @param {Number} queueOffset 
+     * 材质 现在需要一个Base着色器与阴影投射着色器 种类有MATERIAL_TYPE
+     * @constructor
+     * @param {Shader} baseShader Base着色器 用于计算主光源
+     * @param {Shader} shadowCaster 阴影投射着色器 用于投射阴影
+     * @param {MATERIAL_TYPE} materialType 材质类型
+     * @param {Number} queueOffset 渲染队列偏移
      */
     constructor(baseShader, shadowCaster, materialType = MATERIAL_TYPE.OPAQUE, queueOffset = 0)
     {
@@ -45,14 +54,21 @@ class Material
 
         this.cullMode = CULL_MODE.BACK;
 
+        this.materialType = materialType;
         this.setMaterialType(materialType, queueOffset);
 
         this.bLoaded = false;
         this.attributeList = [];
     }
 
+    /**
+     * 设置材质类型
+     * @param {MATERIAL_TYPE} materialType 材质类型
+     * @param {Number} offset 渲染队列偏移
+     */
     setMaterialType(materialType, offset)
     {
+        this.materialType = materialType;
         switch (materialType)
         {
             case MATERIAL_TYPE.OPAQUE:
@@ -94,12 +110,21 @@ class Material
         }
     }
 
+    /**
+     * 设置混合系数
+     * @param {GLenum} srcFactor 源混合系数
+     * @param {GLenum} desFactor 目标混合系数
+     */
     setBlendFactor(srcFactor, desFactor)
     {
         this.srcFactor = srcFactor;
         this.desFactor = desFactor;
     }
 
+    /**
+     * 设置材质剔除模式
+     * @param {CULL_MODE} cullMode 剔除模式
+     */
     setCullMode(cullMode){
         this.cullMode = cullMode;
     }
@@ -150,14 +175,15 @@ class Material
     }
 
     /**
-     * 
-     * @param {String} param 
-     * @param {Number} x 
-     * @param {Number} y 
-     * @param {Number} z 
+     * 设置shader三维参数
+     * @param {String} param 参数名称
+     * @param {Number} x x
+     * @param {Number} y y
+     * @param {Number} z z
      */
     setVector3f(param, x = 0.0, y = 0.0, z = 0.0)
     {
+        // TODO：没设置阴影投射着色器的
         this.addAttribute(ATTRIBURE_TYPE.VECTOR3, param, [x, y, z]);
 
         gl.useProgram(this.getBaseProgram());
@@ -167,15 +193,16 @@ class Material
     }
 
     /**
-     * 
-     * @param {String} param 
-     * @param {Number} x 
-     * @param {Number} y 
-     * @param {Number} z 
-     * @param {Number} w 
+     * 设置shader四维参数
+     * @param {String} param 参数名称
+     * @param {Number} x x
+     * @param {Number} y y
+     * @param {Number} z z
+     * @param {Number} w w
      */
     setVector4f(param, x = 0.0, y = 0.0, z = 0.0, w = 1.0)
     {
+        // TODO：没设置阴影投射着色器的
         this.addAttribute(ATTRIBURE_TYPE.VECTOR4, param, [x, y, z, w]);
 
         gl.useProgram(this.getBaseProgram());
@@ -185,9 +212,9 @@ class Material
     }
 
     /**
-     * 
-     * @param {String} param 
-     * @param {Texture} texture 
+     * 设置Shader贴图采样器参数
+     * @param {String} param 参数名称
+     * @param {Texture} texture 贴图
      */
     setTexture(param, texture)
     {
@@ -198,6 +225,12 @@ class Material
         gl.useProgram(null);
     }
 
+    /**
+     * 将参数储存到Material中
+     * @param {ATTRIBURE_TYPE} attributeType 参数类型
+     * @param {String} name 参数名称
+     * @param {*} value 参数值
+     */
     addAttribute(attributeType, name, value)
     {
         let attri = this.attributeList.find((attribute) =>
@@ -215,9 +248,11 @@ class Material
         }
     }
 
+    /**
+     * Shader重新编译后 将材质中储存的参数重新赋值给Shader
+     */
     shaderChanged()
     {
-        // console.log(this.attributeList);
         gl.useProgram(this.getBaseProgram());
         for (let i = 0; i < this.attributeList.length; i++)
         {

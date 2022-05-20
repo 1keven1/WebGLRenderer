@@ -2,11 +2,10 @@
 class Texture
 {
     /**
-     * 
+     * 贴图文件 会自动绑定到Texture Unit
      * @constructor
-     * @param {String} texFile 
-     * @param {any} texUnit 
-     * @param {any} texType 
+     * @param {String} texFile 贴图文件路径
+     * @param {GLenum} texType 贴图类型
      */
     constructor(texFile, texType = gl.TEXTURE_2D)
     {

@@ -1,13 +1,14 @@
 'use strict';
 class Scene {
     /**
-     * 
-     * @param {Model[]} modelList 
-     * @param {Material[]} materialList 
-     * @param {Texture[]} textureList 
-     * @param {Mesh[]} meshList 
-     * @param {Light[]} lightList 
-     * @param {Camera} camera 
+     * 整个场景 只有其中的东西会被加载
+     * @constructor
+     * @param {Model[]} modelList 需要加载的模型
+     * @param {Material[]} materialList 需要加载的材质
+     * @param {Texture[]} textureList 需要加载的贴图
+     * @param {Mesh[]} meshList 场景内的Mesh
+     * @param {Light[]} lightList 场景内的光源
+     * @param {Camera} camera 渲染所用相机
      */
     constructor(modelList, materialList, textureList, meshList, lightList, camera) {
         this.modelList = modelList;
