@@ -1,4 +1,3 @@
-setVector4f和3f的TODO
 先换成textarea
 研究MipMap
 环境光为场景限定

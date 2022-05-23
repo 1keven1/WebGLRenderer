@@ -164,11 +164,19 @@ class Material
         }
     }
 
+    /**
+     * 获得基础Shader程序
+     * @returns {WebGLProgram} 基础着色器
+     */
     getBaseProgram()
     {
         return this.baseShader.program;
     }
 
+    /**
+     * 获取阴影投射Shader程序
+     * @returns {WebGLProgram} 阴影投射着色器
+     */
     getShadowCasterProgram()
     {
         return this.shadowCaster.program;
@@ -183,13 +191,25 @@ class Material
      */
     setVector3f(param, x = 0.0, y = 0.0, z = 0.0)
     {
-        // TODO：没设置阴影投射着色器的
         this.addAttribute(ATTRIBURE_TYPE.VECTOR3, param, [x, y, z]);
 
+        let bExist = false;
         gl.useProgram(this.getBaseProgram());
         let u_Param = gl.getUniformLocation(this.getBaseProgram(), param);
-        gl.uniform3f(u_Param, x, y, z);
+        if(u_Param){
+            gl.uniform3f(u_Param, x, y, z);
+            bExist = true;
+        }
+
+        gl.useProgram(this.getShadowCasterProgram());
+        u_Param = gl.getUniformLocation(this.getShadowCasterProgram(), param);
+        if (u_Param) {
+            gl.uniform3f(u_Param, x, y, z);
+            bExist = true;
+        }
         gl.useProgram(null);
+
+        if(!bExist) console.warn(param + '：参数不存在');
     }
 
     /**
@@ -202,13 +222,25 @@ class Material
      */
     setVector4f(param, x = 0.0, y = 0.0, z = 0.0, w = 1.0)
     {
-        // TODO：没设置阴影投射着色器的
         this.addAttribute(ATTRIBURE_TYPE.VECTOR4, param, [x, y, z, w]);
 
+        let bExist = false;
         gl.useProgram(this.getBaseProgram());
         let u_Param = gl.getUniformLocation(this.getBaseProgram(), param);
-        gl.uniform4f(u_Param, x, y, z, w);
+        if (u_Param) {
+            gl.uniform4f(u_Param, x, y, z, w);
+            bExist = true;
+        }
+
+        gl.useProgram(this.getShadowCasterProgram());
+        u_Param = gl.getUniformLocation(this.getShadowCasterProgram(), param);
+        if (u_Param) {
+            gl.uniform4f(u_Param, x, y, z, w);
+            bExist = true;
+        }
         gl.useProgram(null);
+
+        if (!bExist) console.warn(param + '：参数不存在');
     }
 
     /**
@@ -219,10 +251,24 @@ class Material
     setTexture(param, texture)
     {
         this.addAttribute(ATTRIBURE_TYPE.TEXTURE, param, texture);
+
+        let bExist = false;
         gl.useProgram(this.getBaseProgram());
         let u_Param = gl.getUniformLocation(this.getBaseProgram(), param);
-        gl.uniform1i(u_Param, texture.texIndex);
+        if (u_Param) {
+            gl.uniform1i(u_Param, texture.texIndex);
+            bExist = true;
+        }
+
+        gl.useProgram(this.getShadowCasterProgram());
+        u_Param = gl.getUniformLocation(this.getShadowCasterProgram(), param);
+        if (u_Param) {
+            gl.uniform1i(u_Param, texture.texIndex);
+            bExist = true;
+        }
         gl.useProgram(null);
+
+        if (!bExist) console.warn(param + '：参数不存在');
     }
 
     /**
