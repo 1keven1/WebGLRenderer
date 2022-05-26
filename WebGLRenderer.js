@@ -348,7 +348,7 @@ class CodeEditor {
             this.tabContainer.appendChild(tab);
             this.tabs.push(tab);
 
-            let panel = document.createElement('div');
+            let panel = document.createElement('code');
             panel.textContent = panelContents[index];
             panel.contentEditable = true;
             panel.classList.add('panel');

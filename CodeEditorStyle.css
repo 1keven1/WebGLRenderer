@@ -62,15 +62,15 @@
     overflow: auto;
     scroll-behavior: smooth;
 
-    font-family: 'Courier New', Courier, monospace;
 }
 
-.panel {
+.panels code {
     padding: 1rem 1rem;
     display: none;
     white-space: pre;
 
     font-size: 1.5rem;
+    font-family: 'Courier New', Courier, monospace;
 }
 
 .panel.enable {
