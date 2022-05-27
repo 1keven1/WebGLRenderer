@@ -269,7 +269,7 @@ class CodeEditor {
 
         // resize操作
         this.resizeHandler.addEventListener('mousedown', (ev) => {
-            if(!this.resizeHandler.bActive) return;
+            if (!this.resizeHandler.bActive) return;
             this.resizeHandler.holding = true;
             this.panelContainer.blur();
         })
@@ -293,6 +293,10 @@ class CodeEditor {
         this.removeTabs();
 
         this.spawnTabs();
+
+        this.panels.forEach((panel, index, arr) => {
+            this.refreshHighlight(panel);
+        })
 
         this.tabs.forEach((tab, index, arr) => {
             tab.index = index;
@@ -352,6 +356,8 @@ class CodeEditor {
             panel.textContent = panelContents[index];
             panel.contentEditable = true;
             panel.classList.add('panel');
+            if (tab.type === CODE_TYPE.JS) panel.classList.add('language-javascript');
+            if (tab.type === CODE_TYPE.VSHADER || tab.type === CODE_TYPE.FSAHDER) panel.classList.add('language-glsl');
             this.panelContainer.appendChild(panel);
             this.panels.push(panel);
         })
@@ -443,6 +449,14 @@ class CodeEditor {
                 anim = null;
             }
         }, 1000 / 60);
+    }
+
+    /**
+     * 刷新面板代码高亮
+     * @param {HTMLElement} panel 需要刷新高亮的面板
+     */
+    refreshHighlight(panel) {
+        hljs.highlightElement(panel);
     }
 }
 
