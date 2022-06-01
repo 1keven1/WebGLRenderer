@@ -36,6 +36,16 @@ canvas {
     position: absolute;
 }
 
+.show-panel{
+    position: absolute;
+    width: 400px;
+    top: 5px;
+    bottom: 5px;
+    left: 0px;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
 /* HUD界面 */
 .hud {
     position: absolute;
@@ -106,11 +116,10 @@ canvas {
 
 /* 阿里巴巴iconfont引用 */
 @font-face {
-    font-family: 'iconfont';
-    /* Project id 3404324 */
-    src: url('//at.alicdn.com/t/font_3404324_og2z4wub2r.woff2?t=1652770831662') format('woff2'),
-        url('//at.alicdn.com/t/font_3404324_og2z4wub2r.woff?t=1652770831662') format('woff'),
-        url('//at.alicdn.com/t/font_3404324_og2z4wub2r.ttf?t=1652770831662') format('truetype');
+  font-family: 'iconfont';  /* Project id 3404324 */
+  src: url('//at.alicdn.com/t/font_3404324_3to9kxppqtk.woff2?t=1654050691239') format('woff2'),
+       url('//at.alicdn.com/t/font_3404324_3to9kxppqtk.woff?t=1654050691239') format('woff'),
+       url('//at.alicdn.com/t/font_3404324_3to9kxppqtk.ttf?t=1654050691239') format('truetype');
 }
 
 .iconfont {

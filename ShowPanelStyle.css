@@ -1,0 +1,120 @@
+.show-panel{
+    background-color: hsla(270, 30%, 30%, 0.9);
+    color: white;
+
+    transition-property: left;
+    transition-timing-function: ease-out;
+    transition-duration: 0.3s;
+
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.show-panel .show-cases{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.show-panel > .title{
+    text-align: center;
+    font-size: 2rem;
+    color: white;
+    /* background-image: linear-gradient(0deg, rgba(255, 255, 255, 0.1), transparent 50%); */
+
+    padding: 1rem;
+    /* border-bottom: rgba(255, 255, 255, 0.1) 2px solid; */
+}
+
+.show-panel .show-cases{
+    background-image: linear-gradient(180deg, rgba(0, 0, 0, 0.2), transparent 3%);
+}
+
+/* show case设置 */
+.show-panel .show-cases .show-case{
+    width: 100;
+    height: 150px;
+    background-color: hsl(300, 20%, 50%);
+    margin: 1rem;
+    border-radius: 1rem;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: row;
+
+    box-shadow: rgba(0, 0, 0, 0) 1px 3px 10px;
+    transition: box-shadow 0.3s;
+}
+
+.show-panel .show-cases .show-case img{
+    position: relative;
+    display: block;
+    height: 100%;
+    width: 150px;
+    float: left;
+    background-color: black;
+}
+
+.show-panel .show-cases .show-case:hover{
+    box-shadow: rgba(0, 0, 0, 0.4) 1px 3px 10px;
+    cursor: pointer;
+}
+
+.show-panel .show-cases .show-case .text{
+    flex: 1;
+    text-align: left;
+    color: white;
+    padding: 2rem;
+}
+
+.show-panel .show-cases .show-case .text .title{
+    position: relative;
+    font-weight:700;
+    width: 100%;
+    height: 50%;
+    bottom: 0.5rem;
+    font-size: 2.5rem;
+}
+
+.show-panel .show-cases .show-case .text .title p{
+    margin: 0;
+    position: absolute;
+    width: 100%;
+    bottom: 0px;
+}
+
+.show-panel .show-cases .show-case .text .description{
+    position: relative;
+    width: 100%;
+    height: 50%;
+    font-size: 1.5rem;
+}
+
+/* 切换按钮 */
+.show-panel .toggle-panel {
+    position: absolute;
+    bottom: 10px;
+    right: -40px;
+    width: 40px;
+    height: 100px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    background-color: hsl(270, 40%, 40%);
+    cursor: pointer;
+}
+
+.show-panel .toggle-panel:hover {
+    background-color: hsl(280, 90%, 50%);
+}
+
+.show-panel .toggle-panel.iconfont {
+    font-size: 2.5rem;
+    line-height: 100px;
+    text-align: center;
+    font-weight: lighter;
+    color: white;
+    -webkit-text-stroke-width: 0px;
+}

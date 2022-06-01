@@ -35,6 +35,7 @@ class WebGLRenderer {
         this.frameRequest = null;
         this.codeEditor = new CodeEditor(this);
         this.hud = new HUD(this);
+        this.showCasesPanel = new ShowCasesPanel(this);
         this.clearColor = [0.0, 0.0, 0.0, 1.0];
 
         this.implementEvents();
@@ -197,8 +198,6 @@ class WebGLRenderer {
         ctx.fillText('Current Angle: ' + Math.floor(100), 40, 200);
     }
 }
-
-
 
 let CODE_TYPE = {
     JS: Symbol(0),
@@ -514,5 +513,39 @@ class HUD {
         if (this.centerHud.visability === visability) return;
         this.centerHud.visability = visability;
         this.centerHud.style.display = visability ? 'flex' : 'none';
+    }
+}
+
+class ShowCasesPanel{
+    constructor(renderer){
+        this.renderer = renderer;
+
+        this.showPanel = document.querySelector('.show-panel');
+        this.caseContainer = document.querySelector('.show-cases');
+        this.togglePanel = document.querySelector('.toggle-panel');
+
+        this.visability = false;
+
+        this.implementEvents();
+        this.initialize();
+    }
+
+    initialize(){
+        this.showPanel.style.transitionProperty = 'none';
+
+        this.showPanel.style.left = this.visability ? '0px' : '-400px';
+    }
+
+    implementEvents(){
+        // 显示和收起
+        this.togglePanel.addEventListener('click', () => {
+            this.showPanel.style.transitionProperty = 'left';
+            this.changeVisability(!this.visability);
+        })
+    }
+
+    changeVisability(visability){
+        if(visability !== this.visability) this.visability = visability;
+        this.showPanel.style.left = visability ? '0px' : '-400px';
     }
 }

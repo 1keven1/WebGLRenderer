@@ -6,6 +6,7 @@
     <title>WebGL渲染器</title>
     <link rel="stylesheet" href="./MainStyle.css">
     <link rel="stylesheet" href="./CodeEditorStyle.css">
+    <link rel="stylesheet" href="./ShowPanelStyle.css">
 
     <link rel="stylesheet" href="./highlight/MyHighlight.min.css">
     <script src="./highlight/highlight.min.js"></script>
@@ -37,6 +38,22 @@
                 <button class="apply-code iconfont">&#xe600;</button>
             </div>
         </section>
+
+        <section class="show-panel">
+            <div class="toggle-panel iconfont">&#xe606;</div>
+            <div class="title">内容展示</div>
+            <div class="show-cases">
+                <div class="show-case">
+                    <img src="https://tvax3.sinaimg.cn/mw690/4388538bly1h2sjwn9yalj20sg0sg4e1.jpg" alt="展示图" />
+                    <div class="text">
+                        <div class="title">
+                            <p>标题标题标题</p>
+                        </div>
+                        <div class="description">这里是简介这里是简介这里是简介这里是简介</div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 
     <script src="./Lib/webgl-utils.js"></script>
@@ -54,9 +71,9 @@
     <script src="./FunctionLibrary.js"></script>
 
     <script>
+        // 读取关卡JS文件
         let renderer;
         let request = new XMLHttpRequest();
-
         request.onreadystatechange = () => {
             if (request.readyState === 4 && request.status !== 404) {
                 let customJS = request.responseText;
