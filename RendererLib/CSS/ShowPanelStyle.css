@@ -96,10 +96,10 @@
 /* 切换按钮 */
 .show-panel .toggle-panel {
     position: absolute;
-    bottom: 10px;
-    right: -40px;
-    width: 40px;
-    height: 100px;
+    top: 20px;
+    right: -70px;
+    width: 70px;
+    height: 70px;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
     background-color: hsl(270, 40%, 40%);
@@ -111,8 +111,8 @@
 }
 
 .show-panel .toggle-panel.iconfont {
-    font-size: 2.5rem;
-    line-height: 100px;
+    font-size: 3rem;
+    line-height: 70px;
     text-align: center;
     font-weight: lighter;
     color: white;
