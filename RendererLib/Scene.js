@@ -216,6 +216,7 @@ class Scene {
             let mvpMatrixLight = new Matrix4().set(light.vpMatrix).multiply(mesh.mMatrix);
             if (mesh.material.baseShader.u_Matrix_Light) gl.uniformMatrix4fv(mesh.material.baseShader.u_Matrix_Light, false, mvpMatrixLight.elements);
             if (mesh.material.baseShader.u_ShadowMap) gl.uniform1i(mesh.material.baseShader.u_ShadowMap, light.shadowMapTexUnit - gl.TEXTURE0);
+            if (mesh.material.baseShader.u_ShadowMap_TexelSize) gl.uniform4f(mesh.material.baseShader.u_ShadowMap_TexelSize, light.shadowMapRes, light.shadowMapRes, 1 / light.shadowMapRes, 1/light.shadowMapRes);
 
             // 绘制
             gl.drawElements(gl.TRIANGLES, mesh.model.indexNum, mesh.model.indexBuffer.dataType, 0);

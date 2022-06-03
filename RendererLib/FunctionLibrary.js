@@ -6,7 +6,7 @@ const SMALL_NUMBER = 1e-8;
  * @param {Number} float 输入数据
  * @param {Number} min 下限
  * @param {Number} max 上限
- * @returns 钳制后的值
+ * @returns {Number} 钳制后的值
  */
 let clamp = function (float, min = 0, max = 1) {
     return (float < min) ? min : (float < max) ? float : max;
@@ -18,7 +18,7 @@ let clamp = function (float, min = 0, max = 1) {
  * @param {Number} target 目标值
  * @param {Number} deltaSecond 世界Delta Time
  * @param {Number} interpSpeed 插值速度
- * @returns 下一帧的值
+ * @returns {Number} 下一帧的值
  */
 let fInterpTo = function (current, target, deltaSecond, interpSpeed) {
     if (interpSpeed <= 0.0) return target;
@@ -28,6 +28,16 @@ let fInterpTo = function (current, target, deltaSecond, interpSpeed) {
 
     const deltaMove = dist * clamp(deltaSecond * interpSpeed, 0, 1);
     return current + deltaMove;
+}
+
+/**
+ * 判断某个数是否是二的整数次幂
+ * @param {Number} number 要检测的数据
+ * @returns {Boolean} 是否是二的整数次幂
+ */
+let isPowerOf2 = function(number){
+    if((number & (number - 1)) === 0) return true;
+    return false;
 }
 
 Vector3.prototype.x = function () {
@@ -79,7 +89,7 @@ Vector3.prototype.copy = function () {
 
 /**
  * 复制一份Transform出来
- * @returns 复制出的Transform
+ * @returns {Transform} 复制出的Transform
  */
 Transform.prototype.copy = function () {
     let newTrans = new Transform(this.location.copy(), this.rotation.copy(), this.scale.copy());

@@ -1,5 +1,8 @@
 // 创建需要用到的东西
 let simpleCamera = new SimpleRotateCamera(new Vector3([0, 2, 0]));
+simpleCamera.yawSpeed = 4;
+simpleCamera.pitchSpeed = 4;
+simpleCamera.zoomSpeed = 0.4;
 let light = new Light(new Transform(new Vector3([0.0, 5.0, 0.0]), new Vector3([-45, 45, 0])), new Vector3([1.0, 1.0, 1.0]), 10);
 
 let dogeShader = new Shader('./DefaultShader/DefaultVert.vert', './Res/ShowCase/StartDoge/Doge.frag');

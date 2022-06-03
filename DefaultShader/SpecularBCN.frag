@@ -17,6 +17,7 @@ uniform vec4 u_CameraPos;
 uniform mat4 u_Matrix_Light;
 
 uniform sampler2D u_ShadowMap;
+uniform vec4 u_ShadowMap_TexelSize;
 
 uniform vec3 u_AmbientColor;
 uniform sampler2D u_TexBC;
@@ -39,10 +40,29 @@ float unpackDepth(const in vec4 rgbaDepth) {
 // 获得阴影
 float getShadow() {
     vec3 shadowCoord = (v_PositionFromLight.xyz / v_PositionFromLight.w) / 2.0 + 0.5;
-    vec4 rgbaDepth = texture2D(u_ShadowMap, shadowCoord.xy);
-    float depth = unpackDepth(rgbaDepth);
-    float shadow = (shadowCoord.z > depth + 0.0001) ? 0.0 : 1.0;
-    return shadow;
+    float sum;
+
+    // PCF采样 percentage closer filtering的近似
+    vec2 PCFFilter[9];
+    PCFFilter[0] = vec2(0, 0);
+    PCFFilter[1] = vec2(1, 0);
+    PCFFilter[2] = vec2(-1, 0);
+    PCFFilter[3] = vec2(0, -1);
+    PCFFilter[4] = vec2(0, 1);
+    PCFFilter[5] = vec2(0.707, 0.707);
+    PCFFilter[6] = vec2(-0.707, 0.707);
+    PCFFilter[7] = vec2(0.707, -0.707);
+    PCFFilter[8] = vec2(-0.707, -0.707);
+
+    for(int i = 0; i < 9; i++) {
+        vec2 offset = PCFFilter[i] * u_ShadowMap_TexelSize.zw * vec2(1.5);
+        vec4 rgbaDepth = texture2D(u_ShadowMap, shadowCoord.xy + offset);
+        float depth = unpackDepth(rgbaDepth);
+        float shadow = (shadowCoord.z > depth + 0.0001) ? 0.0 : 1.0;
+        sum += shadow;
+    }
+
+    return sum / 9.0;
 }
 
 // Main函数在这里

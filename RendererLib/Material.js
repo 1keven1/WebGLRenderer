@@ -37,8 +37,7 @@ const ATTRIBURE_TYPE = {
 }
 Object.freeze(ATTRIBURE_TYPE);
 
-class Material
-{
+class Material {
     /**
      * 材质 现在需要一个Base着色器与阴影投射着色器 种类有MATERIAL_TYPE
      * @constructor
@@ -47,8 +46,7 @@ class Material
      * @param {MATERIAL_TYPE} materialType 材质类型
      * @param {Number} queueOffset 渲染队列偏移
      */
-    constructor(baseShader, shadowCaster, materialType = MATERIAL_TYPE.OPAQUE, queueOffset = 0)
-    {
+    constructor(baseShader, shadowCaster, materialType = MATERIAL_TYPE.OPAQUE, queueOffset = 0) {
         this.baseShader = baseShader;
         this.shadowCaster = shadowCaster;
 
@@ -66,11 +64,9 @@ class Material
      * @param {MATERIAL_TYPE} materialType 材质类型
      * @param {Number} offset 渲染队列偏移
      */
-    setMaterialType(materialType, offset)
-    {
+    setMaterialType(materialType, offset) {
         this.materialType = materialType;
-        switch (materialType)
-        {
+        switch (materialType) {
             case MATERIAL_TYPE.OPAQUE:
                 this.bDepthTest = true;
                 this.bBlend = false;
@@ -115,8 +111,7 @@ class Material
      * @param {GLenum} srcFactor 源混合系数
      * @param {GLenum} desFactor 目标混合系数
      */
-    setBlendFactor(srcFactor, desFactor)
-    {
+    setBlendFactor(srcFactor, desFactor) {
         this.srcFactor = srcFactor;
         this.desFactor = desFactor;
     }
@@ -125,28 +120,24 @@ class Material
      * 设置材质剔除模式
      * @param {CULL_MODE} cullMode 剔除模式
      */
-    setCullMode(cullMode){
+    setCullMode(cullMode) {
         this.cullMode = cullMode;
     }
 
-    load()
-    {
+    load() {
         this.bLoaded = true;
         this.loadShader();
     }
 
     loadOver() { }
 
-    loadShader()
-    {
+    loadShader() {
         // 加载Base Shader
-        if (!this.baseShader.bLoaded)
-        {
+        if (!this.baseShader.bLoaded) {
             this.baseShader.loadOver = this.shaderLoadOver.bind(this);
             this.baseShader.load();
         }
-        if (!this.shadowCaster.bLoaded)
-        {
+        if (!this.shadowCaster.bLoaded) {
             this.shadowCaster.loadOver = this.shaderLoadOver.bind(this);
             this.shadowCaster.load();
         }
@@ -154,10 +145,8 @@ class Material
             this.loadOver();
     }
 
-    shaderLoadOver()
-    {
-        if (this.baseShader.program && this.shadowCaster.program)
-        {
+    shaderLoadOver() {
+        if (this.baseShader.program && this.shadowCaster.program) {
             this.baseShader.loadOver = this.shaderChanged.bind(this);
             this.shadowCaster.loadOver = this.shaderChanged.bind(this);
             this.loadOver();
@@ -168,8 +157,7 @@ class Material
      * 获得基础Shader程序
      * @returns {WebGLProgram} 基础着色器
      */
-    getBaseProgram()
-    {
+    getBaseProgram() {
         return this.baseShader.program;
     }
 
@@ -177,8 +165,7 @@ class Material
      * 获取阴影投射Shader程序
      * @returns {WebGLProgram} 阴影投射着色器
      */
-    getShadowCasterProgram()
-    {
+    getShadowCasterProgram() {
         return this.shadowCaster.program;
     }
 
@@ -189,14 +176,13 @@ class Material
      * @param {Number} y y
      * @param {Number} z z
      */
-    setVector3f(param, x = 0.0, y = 0.0, z = 0.0)
-    {
+    setVector3f(param, x = 0.0, y = 0.0, z = 0.0) {
         this.addAttribute(ATTRIBURE_TYPE.VECTOR3, param, [x, y, z]);
 
         let bExist = false;
         gl.useProgram(this.getBaseProgram());
         let u_Param = gl.getUniformLocation(this.getBaseProgram(), param);
-        if(u_Param){
+        if (u_Param) {
             gl.uniform3f(u_Param, x, y, z);
             bExist = true;
         }
@@ -209,7 +195,7 @@ class Material
         }
         gl.useProgram(null);
 
-        if(!bExist) console.warn(param + '：参数不存在');
+        if (!bExist) console.warn(param + '：参数不存在');
     }
 
     /**
@@ -220,8 +206,7 @@ class Material
      * @param {Number} z z
      * @param {Number} w w
      */
-    setVector4f(param, x = 0.0, y = 0.0, z = 0.0, w = 1.0)
-    {
+    setVector4f(param, x = 0.0, y = 0.0, z = 0.0, w = 1.0) {
         this.addAttribute(ATTRIBURE_TYPE.VECTOR4, param, [x, y, z, w]);
 
         let bExist = false;
@@ -248,8 +233,7 @@ class Material
      * @param {String} param 参数名称
      * @param {Texture} texture 贴图
      */
-    setTexture(param, texture)
-    {
+    setTexture(param, texture) {
         this.addAttribute(ATTRIBURE_TYPE.TEXTURE, param, texture);
 
         let bExist = false;
@@ -258,14 +242,22 @@ class Material
         if (u_Param) {
             gl.uniform1i(u_Param, texture.texIndex);
             bExist = true;
+            // 设置_TexelSize参数
+            let u_Param_TexelSize = gl.getUniformLocation(this.getBaseProgram(), param + '_TexelSize');
+            if (u_Param_TexelSize) gl.uniform4f(u_Param_TexelSize, texture.height, texture.width, 1 / texture.height, 1 / texture.width);
         }
 
+        // 阴影投射shader 基本与上面一样
         gl.useProgram(this.getShadowCasterProgram());
         u_Param = gl.getUniformLocation(this.getShadowCasterProgram(), param);
         if (u_Param) {
             gl.uniform1i(u_Param, texture.texIndex);
             bExist = true;
+
+            let u_Param_TexelSize = gl.getUniformLocation(this.getShadowCasterProgram(), param + '_TexelSize');
+            if (u_Param_TexelSize) gl.uniform4f(u_Param_TexelSize, texture.height, texture.width, 1 / texture.height, 1 / texture.width);
         }
+
         gl.useProgram(null);
 
         if (!bExist) console.warn(param + '：参数不存在');
@@ -277,15 +269,12 @@ class Material
      * @param {String} name 参数名称
      * @param {*} value 参数值
      */
-    addAttribute(attributeType, name, value)
-    {
-        let attri = this.attributeList.find((attribute) =>
-        {
+    addAttribute(attributeType, name, value) {
+        let attri = this.attributeList.find((attribute) => {
             return attribute.type === attributeType && attribute.name === name;
         })
         if (attri) attri.value = value;
-        else
-        {
+        else {
             attri = new Object();
             attri.type = attributeType;
             attri.name = name;
@@ -297,21 +286,16 @@ class Material
     /**
      * Shader重新编译后 将材质中储存的参数重新赋值给Shader
      */
-    shaderChanged()
-    {
+    shaderChanged() {
         gl.useProgram(this.getBaseProgram());
-        for (let i = 0; i < this.attributeList.length; i++)
-        {
+        for (let i = 0; i < this.attributeList.length; i++) {
             let u_Param = gl.getUniformLocation(this.getBaseProgram(), this.attributeList[i].name);
-            if (!u_Param)
-            {
+            if (!u_Param) {
                 // this.attributeList.splice(i, 1);
                 // i--;
             }
-            else
-            {
-                switch (this.attributeList[i].type)
-                {
+            else {
+                switch (this.attributeList[i].type) {
                     case ATTRIBURE_TYPE.SCALAR:
                         break;
                     case ATTRIBURE_TYPE.VECTOR3:

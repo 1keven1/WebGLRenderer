@@ -17,6 +17,7 @@ uniform vec4 u_LightColor;
 uniform vec4 u_CameraPos;
 
 uniform sampler2D u_ShadowMap;
+uniform vec4 u_ShadowMap_TexelSize;
 
 uniform vec3 u_AmbientColor;
 uniform sampler2D u_Texture;
@@ -41,23 +42,43 @@ float unpackDepth(const in vec4 rgbaDepth) {
 // 获取阴影函数
 float getShadow() {
     vec3 shadowCoord = (v_PositionFromLight.xyz / v_PositionFromLight.w) / 2.0 + 0.5;
-    vec4 rgbaDepth = texture2D(u_ShadowMap, shadowCoord.xy);
-    float depth = unpackDepth(rgbaDepth);
-    float shadow = (shadowCoord.z > depth + 0.0001) ? 0.0 : 1.0;
-    return shadow;
+    float sum;
+
+    // PCF采样 percentage closer filtering的近似
+    vec2 PCFFilter[9];
+    PCFFilter[0] = vec2(0, 0);
+    PCFFilter[1] = vec2(1, 0);
+    PCFFilter[2] = vec2(-1, 0);
+    PCFFilter[3] = vec2(0, -1);
+    PCFFilter[4] = vec2(0, 1);
+    PCFFilter[5] = vec2(0.707, 0.707);
+    PCFFilter[6] = vec2(-0.707, 0.707);
+    PCFFilter[7] = vec2(0.707, -0.707);
+    PCFFilter[8] = vec2(-0.707, -0.707);
+
+    for(int i = 0; i < 9; i++){
+        vec2 offset = PCFFilter[i] * u_ShadowMap_TexelSize.zw * vec2(1.5);
+        vec4 rgbaDepth = texture2D(u_ShadowMap, shadowCoord.xy + offset);
+        float depth = unpackDepth(rgbaDepth);
+        float shadow = (shadowCoord.z > depth + 0.0001) ? 0.0 : 1.0;
+        sum += shadow;
+    }
+
+    return sum / 9.0;
 }
 
 // Main函数在这里
 void main() {
     vec2 uv = v_TexCoord.xy * vec2(2);
+    float mipmapBias = float(-1);
 
-    vec3 albedo = texture2D(u_Texture, uv).xyz;
+    vec3 albedo = texture2D(u_Texture, uv, mipmapBias).xyz;
 
     // 法线
     vec3 worldNormal = normalize(v_WorldNormal);
     vec3 worldTangent = normalize(v_WorldTangent);
     vec3 WorldBinormal = normalize(v_WorldBinormal);
-    vec3 tangentNormal = texture2D(u_Normal, uv).xyz * vec3(2) - vec3(1);
+    vec3 tangentNormal = texture2D(u_Normal, uv, mipmapBias).xyz * vec3(2) - vec3(1);
     tangentNormal.xy *= 0.9; 
     vec3 finalNormal = normalize(vec3(tangentNormal.x) * worldTangent + vec3(-tangentNormal.y) * WorldBinormal + vec3(tangentNormal.z) * worldNormal);
 
@@ -70,7 +91,7 @@ void main() {
     vec3 viewDir = normalize(v_viewDir);
     vec3 halfVec = normalize(lightDir + viewDir);
     float nDotH = max(0.0, dot(finalNormal, halfVec));
-    float roughness = texture2D(u_Roughness, uv).x;
+    float roughness = texture2D(u_Roughness, uv, mipmapBias).x;
 
     vec3 specular = pow(nDotH, 128.0) * u_LightColor.xyz * (1.0 - roughness);
 
@@ -79,7 +100,7 @@ void main() {
 
     float shadow = getShadow();
 
-    float ao = texture2D(u_AO, uv).x;
+    float ao = texture2D(u_AO, uv, mipmapBias).x;
     vec3 finalColor = (diffuse + specular) * shadow * ao + ambient;
     gl_FragColor = vec4(finalColor, 1);
 }
