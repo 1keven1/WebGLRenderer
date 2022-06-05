@@ -202,7 +202,7 @@ class WebGLRenderer {
 let CODE_TYPE = {
     JS: Symbol(0),
     VSHADER: Symbol(1),
-    FSAHDER: Symbol(2)
+    FSHADER: Symbol(2)
 }
 Object.freeze(CODE_TYPE);
 
@@ -267,7 +267,7 @@ class CodeEditor {
                     this.refreshHighlight(panel);
                     this.applyVShaderCode(tab.target, code);
                     break;
-                case CODE_TYPE.FSAHDER:
+                case CODE_TYPE.FSHADER:
                     this.refreshHighlight(panel);
                     this.applyFShaderCode(tab.target, code);
                     break;
@@ -339,18 +339,14 @@ class CodeEditor {
         let tabTarget = ['js'];
         let tabType = [CODE_TYPE.JS];
         let panelContents = [this.customJS];
-        this.editableShaderList.forEach((shader, index, arr) => {
-            let vShaderName = shader.vShaderFile.split('/');
-            let fShaderName = shader.fShaderFile.split('/');
-            tabNames.push(vShaderName[vShaderName.length - 1]);
-            tabNames.push(fShaderName[fShaderName.length - 1]);
-            tabType.push(CODE_TYPE.VSHADER);
-            tabType.push(CODE_TYPE.FSAHDER);
-            tabTarget.push(shader);
-            tabTarget.push(shader);
 
-            panelContents.push(shader.vShaderSource);
-            panelContents.push(shader.fShaderSource);
+        this.editableShaderList.forEach((func, index, arr) => {
+            let shaderObject = func();
+
+            tabType.push(shaderObject.type);
+            tabTarget.push(shaderObject.target);
+            tabNames.push(shaderObject.shaderName);
+            panelContents.push(shaderObject.shaderSource);
         })
 
         tabNames.forEach((tabName, index, arr) => {
@@ -367,7 +363,7 @@ class CodeEditor {
             panel.contentEditable = true;
             panel.classList.add('panel');
             if (tab.type === CODE_TYPE.JS) panel.classList.add('language-javascript');
-            if (tab.type === CODE_TYPE.VSHADER || tab.type === CODE_TYPE.FSAHDER) panel.classList.add('language-glsl');
+            if (tab.type === CODE_TYPE.VSHADER || tab.type === CODE_TYPE.FSHADER) panel.classList.add('language-glsl');
             this.panelContainer.appendChild(panel);
             this.panels.push(panel);
         })

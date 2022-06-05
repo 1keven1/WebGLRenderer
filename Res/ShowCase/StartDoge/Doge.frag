@@ -75,7 +75,7 @@ void main() {
     vec3 WorldBinormal = normalize(v_WorldBinormal);
     vec3 tangentNormal = texture2D(u_TexN, uv).xyz * vec3(2) - vec3(1);
     tangentNormal.xy *= 0.7;
-    vec3 finalNormal = normalize(vec3(tangentNormal.x) * worldTangent + vec3(-tangentNormal.y) * WorldBinormal + vec3(tangentNormal.z) * worldNormal);
+    vec3 finalNormal = normalize(vec3(tangentNormal.x) * worldTangent + vec3(tangentNormal.y) * WorldBinormal + vec3(tangentNormal.z) * worldNormal);
 
     // 漫反射
     vec3 albedo = texture2D(u_TexBC, uv).xyz;

@@ -15,6 +15,8 @@ class Shader
         this.program = null;
         this.bLoaded = false;
 
+        this.vShaderName = vShaderFile.split('/')[vShaderFile.split('/').length - 1];
+        this.fShaderName = fShaderFile.split('/')[fShaderFile.split('/').length - 1];
 
         this.a_Position = -1;
         this.a_TexCoord = -1;
@@ -93,6 +95,24 @@ class Shader
         this.u_Matrix_Light = gl.getUniformLocation(this.program, 'u_Matrix_Light');
         this.u_ShadowMap = gl.getUniformLocation(this.program, 'u_ShadowMap');
         this.u_ShadowMap_TexelSize = gl.getUniformLocation(this.program, 'u_ShadowMap_TexelSize');
+    }
+
+    VS(){
+        let o = new Object();
+        o.target = this;
+        o.type = CODE_TYPE.VSHADER;
+        o.shaderName = this.vShaderName;
+        o.shaderSource = this.vShaderSource;
+        return o;
+    }
+
+    FS(){
+        let o = new Object();
+        o.target = this;
+        o.type = CODE_TYPE.FSHADER;
+        o.shaderName = this.fShaderName;
+        o.shaderSource = this.fShaderSource;
+        return o;
     }
 
     applyChange(vSource, fSource)
