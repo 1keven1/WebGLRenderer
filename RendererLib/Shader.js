@@ -95,6 +95,8 @@ class Shader
         this.u_Matrix_Light = gl.getUniformLocation(this.program, 'u_Matrix_Light');
         this.u_ShadowMap = gl.getUniformLocation(this.program, 'u_ShadowMap');
         this.u_ShadowMap_TexelSize = gl.getUniformLocation(this.program, 'u_ShadowMap_TexelSize');
+
+        this.u_AmbientColor = gl.getUniformLocation(this.program, 'u_AmbientColor');
     }
 
     VS(){

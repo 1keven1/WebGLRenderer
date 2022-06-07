@@ -1,8 +1,8 @@
 // 创建需要用到的东西
 let simpleCamera = new SimpleRotateCamera(new Vector3([0, 2, 0]));
-simpleCamera.yawSpeed = 4;
-simpleCamera.pitchSpeed = 4;
-simpleCamera.zoomSpeed = 0.4;
+simpleCamera.yawSpeed = 10;
+simpleCamera.pitchSpeed = 10;
+simpleCamera.zoomSpeed = 1;
 // 光源
 let light = new Light(
     new Transform(new Vector3([0.0, 5.0, 0.0]), new Vector3([-45, 45, 0])), new Vector3([1.0, 1.0, 1.0]), 
@@ -35,7 +35,8 @@ let tDogeN = new Texture('./Res/ShowCase/StartDoge/Doge_N.png');
 this.codeEditor.editableShaderList = [
     floorShader.VS.bind(floorShader), 
     floorShader.FS.bind(floorShader), 
-    dogeShader.FS.bind(dogeShader)];
+    dogeShader.FS.bind(dogeShader)
+]; 
 
 this.clearColor = [0.1, 0.1, 0.11, 1.0];
 
@@ -48,18 +49,17 @@ this.bulidScene = (scene) =>
     scene.meshList = [floor, doge];
     scene.lightList = [light];
     scene.camera = simpleCamera;
+    scene.ambientColor = [0.1, 0.1, 0.11];
 }
 
 // 在运行前执行一次
 this.customBeginPlay = () =>
 {
-    mFloor.setVector3f('u_AmbientColor', 0.1, 0.1, 0.11);
     mFloor.setTexture('u_Texture', tFloorBC);
     mFloor.setTexture('u_Normal', tFloorN);
     mFloor.setTexture('u_Roughness', tFloorR);
     mFloor.setTexture('u_AO', tFloorAO);
 
-    mDoge.setVector3f('u_AmbientColor', 0.1, 0.1, 0.11);
     mDoge.setTexture('u_TexBC', tDogeBC);
     mDoge.setTexture('u_TexN', tDogeN);
 
@@ -69,5 +69,5 @@ this.customBeginPlay = () =>
 // 在运行时逐帧执行
 this.customTick = (deltaSecond) =>
 {
-    doge.addRotationOffset(new Vector3([0, 1.5, 0]).multiplyf(deltaSecond));
+    doge.addRotationOffset(new Vector3([0, 15, 0]).multiplyf(deltaSecond));
 }

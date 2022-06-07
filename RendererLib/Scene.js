@@ -17,6 +17,7 @@ class Scene {
         this.meshList = meshList;
         this.lightList = lightList;
         this.camera = camera;
+        this.ambientColor = [0.1, 0.1, 0.1];
 
         this.modelLoadedNum = 0;
         this.materialLoadedNum = 0;
@@ -141,9 +142,9 @@ class Scene {
     }
 
     /**
-     * 
-    * @param {Mesh} mesh 
-    * @param {Light} light 
+    * 绘制阴影贴图
+    * @param {Mesh} mesh 要绘制的Mesh
+    * @param {Light} light 正在绘制的光源
     */
     drawShadowMap(mesh, light) {
         gl.useProgram(mesh.material.getShadowCasterProgram());
@@ -166,9 +167,9 @@ class Scene {
     }
 
     /**
-     * 
-     * @param {Mesh} mesh 
-     * @param {Light} light 
+     * 绘制模型
+     * @param {Mesh} mesh 要绘制的Mesh
+     * @param {Light} light 正在绘制的光源
      */
     drawMesh(mesh, light) {
         // Base Shader进行渲染
@@ -206,6 +207,7 @@ class Scene {
             if (mesh.material.baseShader.u_LightPos) gl.uniform4f(mesh.material.baseShader.u_LightPos, light.getLightPos().x(), light.getLightPos().y(), light.getLightPos().z(), light.w);
             if (mesh.material.baseShader.u_LightColor) gl.uniform4f(mesh.material.baseShader.u_LightColor, light.lightColor.x(), light.lightColor.y(), light.lightColor.z(), 1);
             if (mesh.material.baseShader.u_CameraPos) gl.uniform4f(mesh.material.baseShader.u_CameraPos, this.camera.getLocation().x(), this.camera.getLocation().y(), this.camera.getLocation().z(), 1);
+            if (mesh.material.baseShader.u_AmbientColor) gl.uniform3f(mesh.material.baseShader.u_AmbientColor, this.ambientColor[0], this.ambientColor[1], this.ambientColor[2]);
 
             let mvpMatrix = new Matrix4().set(this.camera.vpMatrix).multiply(mesh.mMatrix);
             if (mesh.material.baseShader.u_Matrix_MVP) gl.uniformMatrix4fv(mesh.material.baseShader.u_Matrix_MVP, false, mvpMatrix.elements);
@@ -216,7 +218,7 @@ class Scene {
             let mvpMatrixLight = new Matrix4().set(light.vpMatrix).multiply(mesh.mMatrix);
             if (mesh.material.baseShader.u_Matrix_Light) gl.uniformMatrix4fv(mesh.material.baseShader.u_Matrix_Light, false, mvpMatrixLight.elements);
             if (mesh.material.baseShader.u_ShadowMap) gl.uniform1i(mesh.material.baseShader.u_ShadowMap, light.shadowMapTexUnit - gl.TEXTURE0);
-            if (mesh.material.baseShader.u_ShadowMap_TexelSize) gl.uniform4f(mesh.material.baseShader.u_ShadowMap_TexelSize, light.shadowMapRes, light.shadowMapRes, 1 / light.shadowMapRes, 1/light.shadowMapRes);
+            if (mesh.material.baseShader.u_ShadowMap_TexelSize) gl.uniform4f(mesh.material.baseShader.u_ShadowMap_TexelSize, light.shadowMapRes, light.shadowMapRes, 1 / light.shadowMapRes, 1 / light.shadowMapRes);
 
             // 绘制
             gl.drawElements(gl.TRIANGLES, mesh.model.indexNum, mesh.model.indexBuffer.dataType, 0);

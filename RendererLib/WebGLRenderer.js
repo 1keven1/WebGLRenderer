@@ -68,10 +68,10 @@ class WebGLRenderer {
         console.log('开始渲染循环');
         this.lastTime = 0;
         let renderLoop = (timeStamp) => {
-            let deltaSecond = (timeStamp - this.lastTime) * 0.01;
+            let deltaSecond = (timeStamp - this.lastTime) * 0.001;
             this.lastTime = timeStamp;
 
-            if (deltaSecond > 1) deltaSecond = 0.01;
+            if (deltaSecond > 1) deltaSecond = 0.001;
 
             this.scene.update(deltaSecond);
 
@@ -80,7 +80,7 @@ class WebGLRenderer {
             this.scene.calculateMatrices();
             this.scene.render(this.clearColor);
 
-            // this.drawHUD();
+            this.hud.update(deltaSecond);
             this.frameRequest = requestAnimationFrame(renderLoop);
         }
         renderLoop(0);
@@ -483,6 +483,8 @@ class HUD {
         this.centerHud.icon = this.centerHud.querySelector('.iconfont');
         this.centerHud.text = this.centerHud.querySelector('.text');
         this.centerHud.visability = false;
+
+        this.fpsDiv = this.hud.querySelector('.fps');
     }
 
     changeLoadState(loadState) {
@@ -509,6 +511,12 @@ class HUD {
         if (this.centerHud.visability === visability) return;
         this.centerHud.visability = visability;
         this.centerHud.style.display = visability ? 'flex' : 'none';
+    }
+
+    update(deltaSecond){
+        let fps = 1 / deltaSecond;
+
+        this.fpsDiv.textContent = Math.trunc(fps) + ' FPS';
     }
 }
 

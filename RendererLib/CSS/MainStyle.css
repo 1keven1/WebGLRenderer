@@ -92,6 +92,17 @@ canvas {
     font-size: 4rem;
 }
 
+.hud .fps{
+    /* background-color: red; */
+    position: absolute;
+    right: 10px;
+    top: 10px;
+
+    font-size: 2.5rem;
+    color: white;
+    text-shadow: black 0px 0px 5px;
+}
+
 /* 滚动条 */
 ::-webkit-scrollbar {
     width: 8px;
