@@ -361,10 +361,10 @@ class SimpleRotateCamera extends Camera {
 
         this.yaw = 0;
         this.pitch = 20;
-        this.pitchMin = -80;
-        this.pitchMax = 80;
+        this.pitchMin = -90;
+        this.pitchMax = 90;
         this.distanceMin = 2;
-        this.distanceMax = 10;
+        this.distanceMax = 17;
 
         this.mouseLastX = 0.0;
         this.mouseLastY = 0.0;

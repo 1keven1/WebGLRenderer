@@ -10,6 +10,8 @@
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+
+    z-index: 10;
 }
 
 .show-panel .show-cases{
@@ -23,10 +25,8 @@
     text-align: center;
     font-size: 2rem;
     color: white;
-    /* background-image: linear-gradient(0deg, rgba(255, 255, 255, 0.1), transparent 50%); */
 
     padding: 1rem;
-    /* border-bottom: rgba(255, 255, 255, 0.1) 2px solid; */
 }
 
 .show-panel .show-cases{
@@ -35,7 +35,6 @@
 
 /* show case设置 */
 .show-panel .show-cases .show-case{
-    width: 100;
     height: 150px;
     background-color: hsl(300, 20%, 50%);
     margin: 1rem;
@@ -46,7 +45,7 @@
     flex-direction: row;
 
     box-shadow: rgba(0, 0, 0, 0) 1px 3px 10px;
-    transition: box-shadow 0.3s;
+    transition: 0.3s;
 }
 
 .show-panel .show-cases .show-case img{
@@ -54,11 +53,11 @@
     display: block;
     height: 100%;
     width: 150px;
-    float: left;
     background-color: black;
 }
 
 .show-panel .show-cases .show-case:hover{
+    background-color: hsl(300, 25%, 55%);
     box-shadow: rgba(0, 0, 0, 0.4) 1px 3px 10px;
     cursor: pointer;
 }
@@ -67,14 +66,16 @@
     flex: 1;
     text-align: left;
     color: white;
-    padding: 2rem;
+    padding: 1rem;
+
+    text-shadow: rgba(0, 0, 0, 0.3) 0px 0px 10px;
 }
 
 .show-panel .show-cases .show-case .text .title{
     position: relative;
     font-weight:700;
     width: 100%;
-    height: 50%;
+    height: 40%;
     bottom: 0.5rem;
     font-size: 2.5rem;
 }

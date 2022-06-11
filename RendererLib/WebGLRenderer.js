@@ -17,8 +17,6 @@ let initCanvasAndWebGL = function () {
     }
 }
 initCanvasAndWebGL();
-// const hud = document.querySelector('.hud-canvas');
-// const ctx = hud.getContext('2d');
 
 let width = canvas.clientWidth;
 let height = canvas.clientHeight;
@@ -516,7 +514,7 @@ class HUD {
     update(deltaSecond){
         let fps = 1 / deltaSecond;
 
-        this.fpsDiv.textContent = Math.trunc(fps) + ' FPS';
+        this.fpsDiv.textContent = Math.round(fps) + ' FPS';
     }
 }
 
@@ -538,6 +536,28 @@ class ShowCasesPanel{
         this.showPanel.style.transitionProperty = 'none';
 
         this.showPanel.style.left = this.visability ? '0px' : '-400px';
+
+        // 读取JSON文件
+        let jsonRequest = new XMLHttpRequest();
+        jsonRequest.onreadystatechange = () =>{
+            if(jsonRequest.readyState === 4 && jsonRequest.status !== 404){
+                let jsonText = jsonRequest.responseText;
+                let showCaseObjects = JSON.parse(jsonText);
+
+                // 生成ShowCases
+                showCaseObjects.forEach((showCaseObject, index, number) => {
+                    let showCase = this.spawnShowCase(showCaseObject);
+
+                    showCase.addEventListener('click', () => {
+                        window.open(showCase.url);
+                    })
+
+                    this.caseContainer.appendChild(showCase);
+                })
+            }
+        }
+        jsonRequest.open('GET', './ShowCases.json', true);
+        jsonRequest.send();
     }
 
     implementEvents(){
@@ -551,5 +571,41 @@ class ShowCasesPanel{
     changeVisability(visability){
         if(visability !== this.visability) this.visability = visability;
         this.showPanel.style.left = visability ? '0px' : '-400px';
+    }
+
+    /**
+     * 生成ShowCase元素
+     * @param {Object} showCaseObj json解码后的Object
+     * @returns ShowCase Html元素
+     */
+    spawnShowCase(showCaseObj){
+        let showCase = document.createElement('div');
+        showCase.classList.add('show-case');
+
+        let image = document.createElement('img');
+        image.alt = "展示图";
+        showCase.appendChild(image);
+
+        let textDiv = document.createElement('div');
+        textDiv.classList.add('text');
+        showCase.appendChild(textDiv);
+
+        let titleDiv = document.createElement('div');
+        titleDiv.classList.add('title');
+        textDiv.appendChild(titleDiv);
+
+        let desDiv = document.createElement('div');
+        desDiv.classList.add('description');
+        textDiv.appendChild(desDiv);
+
+        let titleP = document.createElement('p');
+        titleDiv.appendChild(titleP);
+
+        image.src = showCaseObj.imageSrc;
+        titleP.textContent = showCaseObj.title;
+        desDiv.textContent = showCaseObj.description;
+        showCase.url = showCaseObj.url;
+
+        return showCase;
     }
 }
