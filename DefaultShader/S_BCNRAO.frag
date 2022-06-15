@@ -29,7 +29,7 @@ varying vec2 v_TexCoord;
 varying vec3 v_WorldNormal;
 varying vec3 v_WorldTangent;
 varying vec3 v_WorldBinormal;
-varying vec3 v_viewDir;
+varying vec3 v_WorldPos;
 
 varying vec4 v_PositionFromLight;
 
@@ -88,7 +88,7 @@ void main() {
     vec3 diffuse = albedo * nDotL * u_LightColor.xyz;
 
     // 高光
-    vec3 viewDir = normalize(v_viewDir);
+    vec3 viewDir = normalize(u_CameraPos.xyz - v_WorldPos);
     vec3 halfVec = normalize(lightDir + viewDir);
     float nDotH = max(0.0, dot(finalNormal, halfVec));
     float roughness = texture2D(u_Roughness, uv, mipmapBias).x;

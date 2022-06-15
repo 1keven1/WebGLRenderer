@@ -15,7 +15,7 @@ varying vec2 v_TexCoord;
 varying vec3 v_WorldNormal;
 varying vec3 v_WorldTangent;
 varying vec3 v_WorldBinormal;
-varying vec3 v_viewDir;
+varying vec3 v_WorldPos;
 
 varying vec4 v_PositionFromLight;
 
@@ -26,13 +26,12 @@ void main() {
     vec3 worldNormal = (vec4(a_Normal.xyz, 0.) * u_Matrix_M_I).xyz;
     vec3 worldTangent = (u_Matrix_M * vec4(a_Tangent, 0)).xyz;
     vec3 worldBinormal = normalize(cross(worldNormal, worldTangent));
-    vec3 viewDir = normalize(u_CameraPos.xyz - worldPosition);
 
     v_TexCoord = a_TexCoord;
     v_WorldNormal = worldNormal;
     v_WorldTangent = worldTangent;
     v_WorldBinormal = worldBinormal;
-    v_viewDir = viewDir;
+    v_WorldPos = worldPosition;
 
     v_PositionFromLight = u_Matrix_Light * a_Position;
 }

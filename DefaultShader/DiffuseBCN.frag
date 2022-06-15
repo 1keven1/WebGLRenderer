@@ -27,7 +27,6 @@ varying vec2 v_TexCoord;
 varying vec3 v_WorldNormal;
 varying vec3 v_WorldTangent;
 varying vec3 v_WorldBinormal;
-varying vec3 v_viewDir;
 
 varying vec4 v_PositionFromLight;
 

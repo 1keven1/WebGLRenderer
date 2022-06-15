@@ -10,5 +10,11 @@
         "description": "自己建模的Doge狗狗，地面是高质量PBR贴图",
         "imageSrc": "./Res/ShowCase/DogeDemo.jpg",
         "url": "./DogeDemo.html"
+    },
+    {
+        "title": "半透明测试",
+        "description": "测试个简单的半透明片 还在优化",
+        "imageSrc": "./Res/ShowCase/Translucent.jpg",
+        "url": "./Translucent.html"
     }
 ]

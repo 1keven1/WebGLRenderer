@@ -82,14 +82,14 @@ class Material {
                 this.renderQueue = 1500 + offset;
                 break;
             case MATERIAL_TYPE.TRANSLUCENT:
-                this.bDepthTest = false;
+                this.bDepthTest = true;
                 this.bBlend = true;
                 this.srcFactor = gl.SRC_ALPHA;
                 this.desFactor = gl.ONE_MINUS_SRC_ALPHA;
                 this.renderQueue = 2000 + offset;
                 break;
             case MATERIAL_TYPE.ADDITIVE:
-                this.bDepthTest = false;
+                this.bDepthTest = true;
                 this.bBlend = true;
                 this.srcFactor = gl.ONE;
                 this.desFactor = gl.ONE;

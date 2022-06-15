@@ -177,7 +177,7 @@ class Scene {
             gl.useProgram(mesh.material.getBaseProgram());
 
             if (mesh.material.bDepthTest) gl.enable(gl.DEPTH_TEST);
-            else gl.disable(gl.DIPTH_TEST);
+            else gl.disable(gl.DEPTH_TEST);
 
             switch (mesh.material.cullMode) {
                 case CULL_MODE.BACK:
@@ -194,6 +194,14 @@ class Scene {
                 default:
                     console.warn("有不正确的Cull Type");
                     break;
+            }
+
+            if(mesh.material.bBlend){
+                gl.enable(gl.BLEND);
+                gl.blendFunc(mesh.material.srcFactor, mesh.material.desFactor);
+            }
+            else{
+                gl.disable(gl.BLEND);
             }
 
             // 绑定Vertex Buffer

@@ -65,7 +65,7 @@ float getShadow() {
 
 // Main函数在这里
 void main() {
-    vec3 albedo = vec3(0.5, 0.5, 0.5);
+    vec3 albedo = vec3(1.0, 0.9, 1.0);
 
     vec3 worldNormal = normalize(v_WorldNormal);
     vec3 lightDir = normalize(u_LightPos.xyz);
@@ -83,5 +83,5 @@ void main() {
     float shadow = getShadow();
 
     vec3 finalColor = (diffuse + specular) * shadow + ambient;
-    gl_FragColor = vec4(finalColor, 1);
+    gl_FragColor = vec4(finalColor, 0.3);
 }

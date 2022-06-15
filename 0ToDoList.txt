@@ -1,4 +1,4 @@
-实现半透明
+实现排序
 支持CubeMap
 使用CubeMap表示全局光照
 Shader添加编译错误指示
