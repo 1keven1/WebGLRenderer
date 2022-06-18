@@ -149,6 +149,15 @@ class Actor {
     getRightVector() {
         return this.rotationMatrix.multiplyVector3(new Vector3([1, 0, 0]));
     }
+
+    /**
+     * 返回与另一个Actor的距离
+     * @param {Actor} actor 另一个Actor
+     * @returns {Number} 距离
+     */
+    distanceToActor(actor){
+        return actor.getLocation().substract(this.getLocation()).getLength();
+    }
 }
 
 class Mesh extends Actor {

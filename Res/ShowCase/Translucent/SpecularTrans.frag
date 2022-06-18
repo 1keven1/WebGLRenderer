@@ -15,11 +15,12 @@ uniform vec4 u_LightPos;
 uniform vec4 u_LightColor;
 uniform vec4 u_CameraPos;
 uniform mat4 u_Matrix_Light;
+uniform vec3 u_AmbientColor;
 
 uniform sampler2D u_ShadowMap;
 uniform vec4 u_ShadowMap_TexelSize;
 
-uniform vec3 u_AmbientColor;
+uniform vec3 u_Color;
 
 varying vec2 v_TexCoord;
 varying vec3 v_WorldNormal;
@@ -65,15 +66,19 @@ float getShadow() {
 
 // Main函数在这里
 void main() {
-    vec3 albedo = vec3(1.0, 0.9, 1.0);
-
     vec3 worldNormal = normalize(v_WorldNormal);
     vec3 lightDir = normalize(u_LightPos.xyz);
+    vec3 viewDir = normalize(u_CameraPos.xyz - v_WorldPos);
+
+    bool twoSizeSign = dot(viewDir, worldNormal) > 0.0;
+    worldNormal *= twoSizeSign ? 1.0 : -1.0;
+
+    // 漫反射
+    vec3 albedo = u_Color;
     float nDotL = max(0.0, dot(worldNormal, lightDir));
     vec3 diffuse = albedo * nDotL * u_LightColor.xyz;
 
     // 高光
-    vec3 viewDir = normalize(u_CameraPos.xyz - v_WorldPos);
     vec3 halfVec = normalize(lightDir + viewDir);
     float nDotH = max(0.0, dot(worldNormal, halfVec));
     vec3 specular = pow(nDotH, 128.0) * u_LightColor.xyz;
@@ -83,5 +88,5 @@ void main() {
     float shadow = getShadow();
 
     vec3 finalColor = (diffuse + specular) * shadow + ambient;
-    gl_FragColor = vec4(finalColor, 0.3);
+    gl_FragColor = vec4(finalColor, 0.5);
 }

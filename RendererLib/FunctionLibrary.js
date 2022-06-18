@@ -32,7 +32,7 @@ let fInterpTo = function (current, target, deltaSecond, interpSpeed) {
 
 /**
  * 判断某个数是否是二的整数次幂
- * @param {Number} number 要检测的数据
+ * @param {Number} number 要检测的数
  * @returns {Boolean} 是否是二的整数次幂
  */
 let isPowerOf2 = function(number){
@@ -84,6 +84,10 @@ Vector3.prototype.multiplyf = function (float) {
 
 Vector3.prototype.copy = function () {
     return new Vector3([this.elements[0], this.elements[1], this.elements[2]]);
+}
+
+Vector3.prototype.getLength = function() {
+    return Math.sqrt(this.elements[0] * this.elements[0] + this.elements[1] * this.elements[1] + this.elements[2] * this.elements[2]);
 }
 
 

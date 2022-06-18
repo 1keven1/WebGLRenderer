@@ -67,7 +67,7 @@ float getShadow() {
 
 // Main函数在这里
 void main() {
-    vec2 uv = v_TexCoord;
+    vec2 uv = v_TexCoord * vec2(2);
     vec3 viewDir = normalize(u_CameraPos.xyz - v_WorldPos);
     
     // 法线
@@ -75,7 +75,7 @@ void main() {
     vec3 worldTangent = normalize(v_WorldTangent);
     vec3 WorldBinormal = normalize(v_WorldBinormal);
     vec3 tangentNormal = texture2D(u_TexN, uv).xyz * vec3(2) - vec3(1);
-    tangentNormal.xy *= 1.0;
+    tangentNormal.xy *= 0.5;
     vec3 finalNormal = normalize(vec3(tangentNormal.x) * worldTangent + vec3(-tangentNormal.y) * WorldBinormal + vec3(tangentNormal.z) * worldNormal);
 
     bool twoSizeSign = dot(viewDir, worldNormal) > 0.0;
@@ -90,7 +90,7 @@ void main() {
     // 高光
     vec3 halfVec = normalize(lightDir + viewDir);
     float nDotH = max(0.0, dot(finalNormal, halfVec));
-    vec3 specular = pow(nDotH, 128.0) * u_LightColor.xyz;
+    vec3 specular = pow(nDotH, 128.0) * u_LightColor.xyz * 0.5;
 
     vec3 ambient = u_AmbientColor.xyz * albedo;
 

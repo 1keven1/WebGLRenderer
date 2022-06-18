@@ -26,6 +26,7 @@ varying vec2 v_TexCoord;
 varying vec3 v_WorldNormal;
 varying vec3 v_WorldTangent;
 varying vec3 v_WorldBinormal;
+varying vec3 v_WorldPos;
 
 varying vec4 v_PositionFromLight;
 
@@ -66,13 +67,17 @@ float getShadow() {
 // Main函数在这里
 void main() {
     vec2 uv = v_TexCoord;
-
-    vec3 albedo = texture2D(u_TexBC, uv).xyz;
-
     vec3 worldNormal = normalize(v_WorldNormal);
     vec3 lightDir = normalize(u_LightPos.xyz);
+    vec3 viewDir = normalize(u_CameraPos.xyz - v_WorldPos);
+
+    bool twoSizeSign = dot(viewDir, worldNormal) > 0.0;
+    worldNormal *= twoSizeSign ? 1.0 : -1.0;
+
+    vec3 albedo = texture2D(u_TexBC, uv).xyz;
     float nDotL = max(0.0, dot(worldNormal, lightDir));
     vec3 diffuse = albedo * nDotL * u_LightColor.xyz;
+
     vec3 ambient = u_AmbientColor.xyz * albedo;
 
     float shadow = getShadow();

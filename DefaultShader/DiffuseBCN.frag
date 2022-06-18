@@ -27,6 +27,7 @@ varying vec2 v_TexCoord;
 varying vec3 v_WorldNormal;
 varying vec3 v_WorldTangent;
 varying vec3 v_WorldBinormal;
+varying vec3 v_WorldPos;
 
 varying vec4 v_PositionFromLight;
 
@@ -75,6 +76,11 @@ void main() {
     vec3 tangentNormal = texture2D(u_TexN, uv).xyz * vec3(2) - vec3(1);
     tangentNormal.xy *= 1.0;
     vec3 finalNormal = normalize(vec3(tangentNormal.x) * worldTangent + vec3(-tangentNormal.y) * WorldBinormal + vec3(tangentNormal.z) * worldNormal);
+
+    vec3 viewDir = normalize(u_CameraPos.xyz - v_WorldPos);
+
+    bool twoSizeSign = dot(viewDir, worldNormal) > 0.0;
+    finalNormal *= twoSizeSign ? 1.0 : -1.0;
 
     // 漫反射
     vec3 albedo = texture2D(u_TexBC, uv).xyz;

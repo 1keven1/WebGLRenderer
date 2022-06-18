@@ -66,17 +66,21 @@ float getShadow() {
 
 // Main函数在这里
 void main() {
+    // 获取参数
     vec2 uv = v_TexCoord;
-
-    vec3 albedo = texture2D(u_TexBC, uv).xyz;
-
     vec3 worldNormal = normalize(v_WorldNormal);
     vec3 lightDir = normalize(u_LightPos.xyz);
+    vec3 viewDir = normalize(u_CameraPos.xyz - v_WorldPos);
+    
+    bool twoSizeSign = dot(viewDir, worldNormal) > 0.0;
+    worldNormal *= twoSizeSign ? 1.0 : -1.0;
+
+    // 漫反射
+    vec3 albedo = texture2D(u_TexBC, uv).xyz;
     float nDotL = max(0.0, dot(worldNormal, lightDir));
     vec3 diffuse = albedo * nDotL * u_LightColor.xyz;
 
     // 高光
-    vec3 viewDir = normalize(u_CameraPos.xyz - v_WorldPos);
     vec3 halfVec = normalize(lightDir + viewDir);
     float nDotH = max(0.0, dot(worldNormal, halfVec));
     vec3 specular = pow(nDotH, 128.0) * u_LightColor.xyz;

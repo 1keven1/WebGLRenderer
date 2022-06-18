@@ -75,6 +75,7 @@ class WebGLRenderer {
 
             this.customTick(deltaSecond);
 
+            this.scene.sortRenderOrder();
             this.scene.calculateMatrices();
             this.scene.render(this.clearColor);
 
