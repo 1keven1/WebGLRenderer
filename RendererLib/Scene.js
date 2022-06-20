@@ -212,6 +212,9 @@ class Scene {
             if (mesh.material.bDepthTest) gl.enable(gl.DEPTH_TEST);
             else gl.disable(gl.DEPTH_TEST);
 
+            if(mesh.material.bDepthWrite) gl.depthMask(true);
+            else gl.depthMask(false);
+
             switch (mesh.material.cullMode) {
                 case CULL_MODE.BACK:
                     gl.enable(gl.CULL_FACE);

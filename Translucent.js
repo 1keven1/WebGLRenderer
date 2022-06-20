@@ -26,7 +26,7 @@ let smQuad = new Model('./Res/Model/Quad.obj', 1);
 let smFloor = new Model('/Res/Model/Plane.obj', 1);
 // Mesh(Actor)
 let quad = new Mesh(new Transform(new Vector3([0, 1.5, 0])), smQuad, mTrans, false);
-let quad2 = new Mesh(new Transform(new Vector3([0, 1.5, 1])), smQuad, mTrans2, false);
+let quad2 = new Mesh(new Transform(new Vector3([0, 1.5, 0.5])), smQuad, mTrans2, false);
 let floor = new Mesh(new Transform(), smFloor, mFloor, true);
 // 贴图
 let tFloor = new Texture('./Res/Material/SpanishPavement_BC.png');

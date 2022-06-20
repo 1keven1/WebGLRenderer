@@ -69,6 +69,7 @@ class Material {
         switch (materialType) {
             case MATERIAL_TYPE.OPAQUE:
                 this.bDepthTest = true;
+                this.bDepthWrite = true;
                 this.bBlend = false;
                 this.srcFactor = gl.SRC_ALPHA;
                 this.desFactor = gl.ONE_MINUS_SRC_ALPHA;
@@ -76,6 +77,7 @@ class Material {
                 break;
             case MATERIAL_TYPE.MASKED:
                 this.bDepthTest = true;
+                this.bDepthWrite = true;
                 this.bBlend = false;
                 this.srcFactor = gl.SRC_ALPHA;
                 this.desFactor = gl.ONE_MINUS_SRC_ALPHA;
@@ -83,6 +85,7 @@ class Material {
                 break;
             case MATERIAL_TYPE.TRANSLUCENT:
                 this.bDepthTest = true;
+                this.bDepthWrite = false;
                 this.bBlend = true;
                 this.srcFactor = gl.SRC_ALPHA;
                 this.desFactor = gl.ONE_MINUS_SRC_ALPHA;
@@ -90,6 +93,7 @@ class Material {
                 break;
             case MATERIAL_TYPE.ADDITIVE:
                 this.bDepthTest = true;
+                this.bDepthWrite = false;
                 this.bBlend = true;
                 this.srcFactor = gl.ONE;
                 this.desFactor = gl.ONE;
@@ -97,6 +101,7 @@ class Material {
                 break;
             default:
                 this.bDepthTest = true;
+                this.bDepthWrite = true;
                 this.bBlend = false;
                 this.srcFactor = gl.SRC_ALPHA;
                 this.desFactor = gl.ONE_MINUS_SRC_ALPHA;
