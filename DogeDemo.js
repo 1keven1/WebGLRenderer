@@ -28,8 +28,8 @@ let tFloorBC = new Texture('./Res/Material/Floor_BC.jpg', gl.TEXTURE_2D);
 let tFloorN = new Texture('./Res/Material/Floor_N.jpg', gl.TEXTURE_2D);
 let tFloorR = new Texture('./Res/Material/Floor_R.jpg', gl.TEXTURE_2D);
 let tFloorAO = new Texture('./Res/Material/Floor_AO.jpg', gl.TEXTURE_2D);
-let tDogeBC = new Texture('./Res/ShowCase/StartDoge/Doge_BC.png');
-let tDogeN = new Texture('./Res/ShowCase/StartDoge/Doge_N.png');
+let tDogeBC = new Texture('./Res/ShowCase/StartDoge/Doge_BC.jpg');
+let tDogeN = new Texture('./Res/ShowCase/StartDoge/Doge_N.jpg');
 
 // 想编辑的Shader列表
 this.codeEditor.editableShaderList = [

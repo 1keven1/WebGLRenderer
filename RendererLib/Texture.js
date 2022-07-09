@@ -7,10 +7,11 @@ class Texture
      * @param {String} texFile 贴图文件路径
      * @param {GLenum} texType 贴图类型
      */
-    constructor(texFile, texType = gl.TEXTURE_2D)
+    constructor(texFile, texType = gl.TEXTURE_2D, texFormat = gl.RGBA)
     {
         this.texFile = texFile;
         this.texType = texType;
+        this.texFormat = texFormat;
 
         this.bGenerateMipmap = true;
 
@@ -51,7 +52,18 @@ class Texture
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
             gl.activeTexture(this.texUnit);
             gl.bindTexture(this.texType, texture);
-            gl.texImage2D(this.texType, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+
+            switch(this.texFormat){
+                case gl.RGBA:
+                    gl.texImage2D(this.texType, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+                    break;
+                case gl.RGBA16F:
+                    gl.texImage2D(this.texType, 0, gl.RGBA16f, gl.RGBA, gl.FLOAT, image);
+                    break;
+                default:
+                    console.log('图片' + this.texFile + ' Format不正确：' + this.texFormat);
+                    return;
+            }
 
             // 其他设置
             // 是否生成MipMap
