@@ -19,14 +19,14 @@ let mBox = new Material(sDiffuseBC, sShadowCaster1, MATERIAL_TYPE.OPAQUE, 0);
 let mFloor = new Material(sSpecularBCN, sShadowCaster2, MATERIAL_TYPE.OPAQUE, 0);
 // 模型
 let smBox = new Model('./Res/Model/Cube.obj', 1);
-let smFloor = new Model('/Res/Model/Plane.obj', 1);
+let smFloor = new Model('./Res/Model/Plane.obj', 1);
 // Mesh(Actor)
 let box = new Mesh(new Transform(new Vector3([0, 1.001, 0]), new Vector3([0, 0, 0])), smBox, mBox, true);
 let floor = new Mesh(new Transform(), smFloor, mFloor, true);
 // 贴图
 let tYangCong = new Texture('./Res/Image/YangCong256.jpg');
 let tFloor = new Texture('./Res/Material/SpanishPavement_BC.png');
-let tFloorN = new Texture('Res/Material/SpanishPavement_N.png')
+let tFloorN = new Texture('./Res/Material/SpanishPavement_N.png')
 
 // 想编辑的Shader列表
 this.codeEditor.editableShaderList = [

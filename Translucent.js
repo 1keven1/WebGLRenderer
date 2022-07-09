@@ -23,7 +23,7 @@ let mTrans2 = new Material(sSpecularTrans2, sShadowCaster3, MATERIAL_TYPE.TRANSL
 let mFloor = new Material(sFloor, sShadowCaster2, MATERIAL_TYPE.OPAQUE, 0);
 // 模型
 let smQuad = new Model('./Res/Model/Quad.obj', 1);
-let smFloor = new Model('/Res/Model/Plane.obj', 1);
+let smFloor = new Model('./Res/Model/Plane.obj', 1);
 // Mesh(Actor)
 let quad = new Mesh(new Transform(new Vector3([0, 1.5, 0])), smQuad, mTrans, false);
 let quad2 = new Mesh(new Transform(new Vector3([0, 1.5, 0.5])), smQuad, mTrans2, false);
