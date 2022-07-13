@@ -26,7 +26,7 @@ let floor = new Mesh(new Transform(), smFloor, mFloor, true);
 // 贴图
 let tYangCong = new Texture('./Res/Image/YangCong256.jpg');
 let tFloor = new Texture('./Res/Material/SpanishPavement_BC.jpg');
-let tFloorN = new Texture('./Res/Material/SpanishPavement_N.jpg')
+let tFloorN = new Texture('./Res/Material/SpanishPavement_N.jpg');
 
 // 想编辑的Shader列表
 this.codeEditor.editableShaderList = [

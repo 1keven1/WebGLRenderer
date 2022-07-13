@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>WebGL渲染器</title>
+    <link rel="stylesheet" href="./RendererLib/CSS/MainStyle.css">
+    <link rel="stylesheet" href="./RendererLib/CSS/CodeEditorStyle.css">
+    <link rel="stylesheet" href="./RendererLib/CSS/ShowPanelStyle.css">
+
+    <link rel="stylesheet" href="./RendererLib/highlight/MyHighlight.min.css">
+    <script src="./RendererLib/highlight/highlight.min.js"></script>
+</head>
+
+<body>
+    <div class="layout">
+        <div class="renderer">
+            <canvas class="gl-canvas">请使用支持Canvas的浏览器</canvas>
+            <!-- <canvas class="hud-canvas" style="z-index: 1;">请使用支持Canvas的浏览器</canvas> -->
+            <div class="hud">
+                <div class="center-hud">
+                    <div class='iconfont'>&#xe8fc;</div>
+                    <div class='text'>加载中···</div>
+                </div>
+                <div class="fps">0 FPS</div>
+            </div>
+        </div>
+
+        <section class="code-editor">
+            <div class="toggle-code iconfont">&#xe6f2;</div>
+            <div class="resize-handler"></div>
+            <div class="tabs">
+                <!-- <div class="tab enable">Example</div> -->
+            </div>
+            <div class="panels">
+                <!-- <code contenteditable="true" class="panel enable">Example</code> -->
+            </div>
+            <div class="footer">
+                <button class="apply-code iconfont">&#xe600;</button>
+            </div>
+        </section>
+
+        <section class="show-panel">
+            <div class="toggle-panel iconfont">&#xe606;</div>
+            <div class="title">内容展示</div>
+            <div class="show-cases">
+                <!-- 
+                <div class="show-case">
+                    <img src="https://tvax3.sinaimg.cn/mw690/4388538bly1h2sjwn9yalj20sg0sg4e1.jpg" alt="展示图" />
+                    <div class="text">
+                        <div class="title">
+                            <p>标题标题标题</p>
+                        </div>
+                        <div class="description">这里是简介这里是简介这里是简介这里是简介</div>
+                    </div>
+                </div> 
+                -->
+            </div>
+        </section>
+    </div>
+
+    <script src="./RendererLib/WebGLLib/webgl-utils.js"></script>
+    <script src="./RendererLib/WebGLLib/webgl-debug.js"></script>
+    <script src="./RendererLib/WebGLLib/cuon-utils.js"></script>
+    <script src="./RendererLib/WebGLLib/cuon-matrix.js"></script>
+
+    <script src="./RendererLib/Actor.js"></script>
+    <script src="./RendererLib/Texture.js"></script>
+    <script src="./RendererLib/Shader.js"></script>
+    <script src="./RendererLib/Material.js"></script>
+    <script src="./RendererLib/Model.js"></script>
+    <script src="./RendererLib/Scene.js"></script>
+    <script src="./RendererLib/WebGLRenderer.js"></script>
+    <script src="./RendererLib/FunctionLibrary.js"></script>
+
+    <script>
+        // 读取关卡JS文件
+        let renderer;
+        let request = new XMLHttpRequest();
+        request.onreadystatechange = () => {
+            if (request.readyState === 4 && request.status !== 404) {
+                let customJS = request.responseText;
+
+                renderer = new WebGLRenderer();
+                renderer.customJS = customJS;
+                renderer.start();
+            }
+        }
+        request.open('GET', './CubeMap.js', true);
+        request.send();
+    </script>
+</body>
+
+</html>

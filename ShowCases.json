@@ -16,5 +16,11 @@
         "description": "测试个简单的半透明片 还在优化",
         "imageSrc": "./Res/ShowCase/Translucent.jpg",
         "url": "./Translucent.html"
+    },
+    {
+        "title": "CubeMap测试",
+        "description": "测试一下CubeMap效果",
+        "imageSrc": "./Res/ShowCase/CubeMap.jpg",
+        "url": "./CubeMap.html"
     }
 ]
