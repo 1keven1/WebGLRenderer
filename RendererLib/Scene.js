@@ -80,12 +80,22 @@ class Scene {
             this.materialLoadedNum === this.materialList.length &&
             this.textureLodedNum === this.textureList.length &&
             this.lightLoadedNum === this.lightList.length) {
+            // 做一些检查
             for (let i = 0; i < this.meshList.length; i++) {
+                // 如果Mesh没加载完 就先剔除掉
                 if (!this.meshList[i].model.bLoaded || !this.meshList[i].material.bLoaded) {
                     if (!this.meshList[i].model.bLoaded) console.warn(this.meshList[i].model.objFile + '：没有加载完整');
                     if (!this.meshList[i].material.bLoaded) console.warn(this.meshList[i].material.baseShader.vShaderFile + '：没有加载');
                     this.meshList.splice(i, 1);
                     i--;
+                    console.warn(i + "号Mesh已由于加载不完整被剔除")
+                    continue;
+                }
+
+                // 如果能投射阴影但是没有ShadowCaster
+                if (this.meshList[i].bCastShadow && (!this.meshList[i].material.shadowCaster)){
+                    this.meshList[i].bCastShadow = false;
+                    console.warn(i + "号Mesh为可投射阴影 但没有Shadow Caster 已自动将其设置为不可投射阴影");
                 }
             }
             this.loadOver();
@@ -105,7 +115,7 @@ class Scene {
     /**
      * 基于renderQueue和距离摄像机的距离对Mesh List排序
      */
-    sortRenderOrder(){
+    sortRenderOrder() {
         // 先计算出所有东西距离摄像机的距离
         this.meshList.forEach((mesh, index, arr) => {
             mesh.distanceFromCamera = mesh.distanceToActor(this.camera);
@@ -114,11 +124,11 @@ class Scene {
         // 排序
         this.meshList.sort((a, b) => {
             // 如果renderqueue值不一样 就按照renderqueue排序
-            if(a.material.renderQueue !== b.material.renderQueue){
+            if (a.material.renderQueue !== b.material.renderQueue) {
                 return (a.material.renderQueue - b.material.renderQueue);
             }
             // 一样就看距离摄像机的距离
-            else{
+            else {
                 // 不透明和蒙版从近到远排序
                 if (a.material.materialType === MATERIAL_TYPE.OPAQUE || a.material.materialType === MATERIAL_TYPE.MASKED)
                     return (a.distanceFromCamera - b.distanceFromCamera);
@@ -126,7 +136,7 @@ class Scene {
                 if (a.material.materialType === MATERIAL_TYPE.TRANSLUCENT || a.material.materialType === MATERIAL_TYPE.ADDITIVE)
                     return -(a.distanceFromCamera - b.distanceFromCamera);
                 // 除此之外不排序 报错
-                else{
+                else {
                     console.error('渲染队列排序：不存在的材质类型：' + a.materialType);
                     return 0;
                 }
@@ -157,7 +167,7 @@ class Scene {
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
             this.meshList.forEach((mesh, meshIndex, arr) => {
-                if (mesh.bCastShadow) this.drawShadowMap(mesh, light);
+                if (mesh.bCastShadow) this.drawShadowMap(mesh, light, meshIndex);
             })
         })
 
@@ -179,11 +189,17 @@ class Scene {
     * @param {Mesh} mesh 要绘制的Mesh
     * @param {Light} light 正在绘制的光源
     */
-    drawShadowMap(mesh, light) {
-        gl.useProgram(mesh.material.getShadowCasterProgram());
+    drawShadowMap(mesh, light, index) {
+        let shadowCaster = mesh.material.getShadowCasterProgram();
+        if (!shadowCaster) {
+            console.warn(index + "号模型可投射阴影但无Shadow Caster");
+            return;
+        }
 
-        if (mesh.material.bDepthTest) gl.enable(gl.DEPTH_TEST);
-        else gl.disable(gl.DIPTH_TEST);
+        gl.useProgram(shadowCaster);
+
+        // if (mesh.material.bDepthTest) gl.enable(gl.DEPTH_TEST);
+        // else gl.disable(gl.DIPTH_TEST);
 
         // 绑定Vertex Buffer
         if (mesh.material.shadowCaster.a_Position >= 0) this.bindAttributeToBuffer(mesh.material.shadowCaster.a_Position, mesh.model.vertexBuffer);
@@ -212,7 +228,7 @@ class Scene {
             if (mesh.material.bDepthTest) gl.enable(gl.DEPTH_TEST);
             else gl.disable(gl.DEPTH_TEST);
 
-            if(mesh.material.bDepthWrite) gl.depthMask(true);
+            if (mesh.material.bDepthWrite) gl.depthMask(true);
             else gl.depthMask(false);
 
             switch (mesh.material.cullMode) {
@@ -232,11 +248,11 @@ class Scene {
                     break;
             }
 
-            if(mesh.material.bBlend){
+            if (mesh.material.bBlend) {
                 gl.enable(gl.BLEND);
                 gl.blendFunc(mesh.material.srcFactor, mesh.material.desFactor);
             }
-            else{
+            else {
                 gl.disable(gl.BLEND);
             }
 

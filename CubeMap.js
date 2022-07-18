@@ -39,7 +39,7 @@ this.bulidScene = (scene) =>
 {
     scene.modelList = [smQuad, smFloor];
     scene.materialList = [mCubeMap, mFloor];
-    scene.textureList = [cubeMap];
+    scene.textureList = [tCubeMap];
     scene.meshList = [box, floor];
     scene.lightList = [light];
     scene.camera = simpleCamera;
@@ -49,7 +49,7 @@ this.bulidScene = (scene) =>
 // 在运行前执行一次
 this.customBeginPlay = () =>
 {
-    mCubeMap.setTexture('u_Cube', cubeMap);
+    mCubeMap.setTexture('u_Cube', tCubeMap);
     mCubeMap.setCullMode(CULL_MODE.OFF);
     box.setCastShadow(false);
 }

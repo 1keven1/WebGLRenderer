@@ -2,6 +2,7 @@
 
 /*
 渲染队列：
+500：天空盒
 1000：不透明
 1500：蒙版
 2000：半透明 叠加
@@ -11,6 +12,7 @@
  * @enum
  */
 const MATERIAL_TYPE = {
+    SKYBOX: Symbol(-1),
     OPAQUE: Symbol(0),
     MASKED: Symbol(1),
     TRANSLUCENT: Symbol(2),
@@ -46,9 +48,11 @@ class Material {
      * @param {MATERIAL_TYPE} materialType 材质类型
      * @param {Number} queueOffset 渲染队列偏移
      */
-    constructor(baseShader, shadowCaster, materialType = MATERIAL_TYPE.OPAQUE, queueOffset = 0) {
+    constructor(baseShader = null, shadowCaster = null, materialType = MATERIAL_TYPE.OPAQUE, queueOffset = 0) {
         this.baseShader = baseShader;
         this.shadowCaster = shadowCaster;
+        this.bBaseShaderLoaded = false;
+        this.bShadowCasterLoaded = false;
 
         this.cullMode = CULL_MODE.BACK;
 
@@ -67,6 +71,14 @@ class Material {
     setMaterialType(materialType, offset) {
         this.materialType = materialType;
         switch (materialType) {
+            case MATERIAL_TYPE.SKYBOX:
+                this.bDepthTest = false;
+                this.bDepthWrite = false;
+                this.bBlend = false;
+                this.srcFactor = gl.SRC_ALPHA;
+                this.desFactor = gl.ONE_MINUS_SRC_ALPHA;
+                this.renderQueue = 500 + offset;
+                break;
             case MATERIAL_TYPE.OPAQUE:
                 this.bDepthTest = true;
                 this.bDepthWrite = true;
@@ -138,22 +150,40 @@ class Material {
 
     loadShader() {
         // 加载Base Shader
-        if (!this.baseShader.bLoaded) {
-            this.baseShader.loadOver = this.shaderLoadOver.bind(this);
+        if (!this.baseShader) {
+            this.bBaseShaderLoaded = true;
+        }
+        else if (!this.baseShader.bLoaded) {
+            this.baseShader.loadOver = this.baseShaderLoadOver.bind(this);
             this.baseShader.load();
         }
-        if (!this.shadowCaster.bLoaded) {
-            this.shadowCaster.loadOver = this.shaderLoadOver.bind(this);
+
+        // 加载Shadow Caster
+        if (!this.shadowCaster) {
+            this.bShadowCasterLoaded = true;
+        }
+        else if (this.shadowCaster && !this.shadowCaster.bLoaded) {
+            this.shadowCaster.loadOver = this.shadowCasterLoadOver.bind(this);
             this.shadowCaster.load();
         }
-        if (this.baseShader.program && this.shadowCaster.program)
-            this.loadOver();
+
+        this.checkShaderLoaded();
     }
 
-    shaderLoadOver() {
-        if (this.baseShader.program && this.shadowCaster.program) {
-            this.baseShader.loadOver = this.shaderChanged.bind(this);
-            this.shadowCaster.loadOver = this.shaderChanged.bind(this);
+    baseShaderLoadOver() {
+        this.bBaseShaderLoaded = true;
+        this.checkShaderLoaded();
+    }
+
+    shadowCasterLoadOver() {
+        this.bShadowCasterLoaded = true;
+        this.checkShaderLoaded();
+    }
+
+    checkShaderLoaded() {
+        if (this.bBaseShaderLoaded && this.bShadowCasterLoaded) {
+            if (this.baseShader) this.baseShader.loadOver = this.shaderChanged.bind(this);
+            if (this.shadowCaster) this.shadowCaster.loadOver = this.shaderChanged.bind(this);
             this.loadOver();
         }
     }
@@ -171,7 +201,8 @@ class Material {
      * @returns {WebGLProgram} 阴影投射着色器
      */
     getShadowCasterProgram() {
-        return this.shadowCaster.program;
+        if (this.shadowCaster) return this.shadowCaster.program;
+        else return null;
     }
 
     /**
@@ -240,27 +271,32 @@ class Material {
      */
     setTexture(param, texture) {
         this.addAttribute(ATTRIBURE_TYPE.TEXTURE, param, texture);
-
         let bExist = false;
-        gl.useProgram(this.getBaseProgram());
-        let u_Param = gl.getUniformLocation(this.getBaseProgram(), param);
-        if (u_Param) {
-            gl.uniform1i(u_Param, texture.texIndex);
-            bExist = true;
-            // 设置_TexelSize参数
-            let u_Param_TexelSize = gl.getUniformLocation(this.getBaseProgram(), param + '_TexelSize');
-            if (u_Param_TexelSize) gl.uniform4f(u_Param_TexelSize, texture.height, texture.width, 1 / texture.height, 1 / texture.width);
+
+        if(this.baseShader){
+            gl.useProgram(this.getBaseProgram());
+            let u_Param = gl.getUniformLocation(this.getBaseProgram(), param);
+            if (u_Param) {
+                gl.uniform1i(u_Param, texture.texIndex);
+                bExist = true;
+                // 设置_TexelSize参数
+                let u_Param_TexelSize = gl.getUniformLocation(this.getBaseProgram(), param + '_TexelSize');
+                if (u_Param_TexelSize) gl.uniform4f(u_Param_TexelSize, texture.height, texture.width, 1 / texture.height, 1 / texture.width);
+            }
         }
+        
 
         // 阴影投射shader 基本与上面一样
-        gl.useProgram(this.getShadowCasterProgram());
-        u_Param = gl.getUniformLocation(this.getShadowCasterProgram(), param);
-        if (u_Param) {
-            gl.uniform1i(u_Param, texture.texIndex);
-            bExist = true;
+        if(this.shadowCaster){
+            gl.useProgram(this.getShadowCasterProgram());
+            let u_Param = gl.getUniformLocation(this.getShadowCasterProgram(), param);
+            if (u_Param) {
+                gl.uniform1i(u_Param, texture.texIndex);
+                bExist = true;
 
-            let u_Param_TexelSize = gl.getUniformLocation(this.getShadowCasterProgram(), param + '_TexelSize');
-            if (u_Param_TexelSize) gl.uniform4f(u_Param_TexelSize, texture.height, texture.width, 1 / texture.height, 1 / texture.width);
+                let u_Param_TexelSize = gl.getUniformLocation(this.getShadowCasterProgram(), param + '_TexelSize');
+                if (u_Param_TexelSize) gl.uniform4f(u_Param_TexelSize, texture.height, texture.width, 1 / texture.height, 1 / texture.width);
+            }
         }
 
         gl.useProgram(null);
