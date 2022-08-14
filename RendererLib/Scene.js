@@ -17,12 +17,17 @@ class Scene {
         this.meshList = meshList;
         this.lightList = lightList;
         this.camera = camera;
+
+        this.ambientCubemap = null;
         this.ambientColor = [0.1, 0.1, 0.1];
 
         this.modelLoadedNum = 0;
         this.materialLoadedNum = 0;
         this.textureLodedNum = 0;
         this.lightLoadedNum = 0;
+
+        this.loadTexture = null;
+        this.loadTextureSrc = './Res/Load/LoadTexture.jpg';
     }
 
     load() {
@@ -38,6 +43,8 @@ class Scene {
             material.load();
         })
         // 加载贴图
+        // 先加载占位贴图
+
         this.textureList.forEach((texture, index, arr) => {
             texture.loadOver = this.textureLoadOver.bind(this);
             texture.load(index);
@@ -100,6 +107,10 @@ class Scene {
             }
             this.loadOver();
         }
+    }
+
+    generateLoadTexture(){
+        
     }
 
     update(deltaSecond) {
@@ -221,7 +232,8 @@ class Scene {
      * @param {Light} light 正在绘制的光源
      */
     drawMesh(mesh, light) {
-        // Base Shader进行渲染
+
+        // 0号光源用Base Shader进行渲染
         if (light.lightIndex === 0) {
             gl.useProgram(mesh.material.getBaseProgram());
 
@@ -265,9 +277,10 @@ class Scene {
 
             // 传入默认变量
             if (mesh.material.baseShader.u_LightPos) gl.uniform4f(mesh.material.baseShader.u_LightPos, light.getLightPos().x(), light.getLightPos().y(), light.getLightPos().z(), light.w);
-            if (mesh.material.baseShader.u_LightColor) gl.uniform4f(mesh.material.baseShader.u_LightColor, light.lightColor.x(), light.lightColor.y(), light.lightColor.z(), 1);
+            if (mesh.material.baseShader.u_LightColor) gl.uniform4f(mesh.material.baseShader.u_LightColor, light.lightColor.x() * light.intensity, light.lightColor.y() * light.intensity, light.lightColor.z() * light.intensity, 1);
             if (mesh.material.baseShader.u_CameraPos) gl.uniform4f(mesh.material.baseShader.u_CameraPos, this.camera.getLocation().x(), this.camera.getLocation().y(), this.camera.getLocation().z(), 1);
             if (mesh.material.baseShader.u_AmbientColor) gl.uniform3f(mesh.material.baseShader.u_AmbientColor, this.ambientColor[0], this.ambientColor[1], this.ambientColor[2]);
+            if (mesh.material.baseShader.u_AmbientCubeMap && this.ambientCubemap) gl.uniform1i(mesh.material.baseShader.u_AmbientCubeMap, this.ambientCubemap.texIndex);
 
             let mvpMatrix = new Matrix4().set(this.camera.vpMatrix).multiply(mesh.mMatrix);
             if (mesh.material.baseShader.u_Matrix_MVP) gl.uniformMatrix4fv(mesh.material.baseShader.u_Matrix_MVP, false, mvpMatrix.elements);

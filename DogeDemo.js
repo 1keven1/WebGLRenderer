@@ -5,8 +5,9 @@ simpleCamera.pitchSpeed = 10;
 simpleCamera.zoomSpeed = 1;
 // 光源
 let light = new Light(
-    new Transform(new Vector3([0.0, 5.0, 0.0]), new Vector3([-45, 45, 0])), new Vector3([1.0, 1.0, 1.0]), 
-    10, 
+    new Transform(new Vector3([0.0, 5.0, 0.0]), new Vector3([-45, 45, 0])), 
+    new Vector3([1.0, 1.0, 1.0]), 
+    1, 
     LIGHT_TYPE.DIRECTIONAL
     );
 // Shader
@@ -54,7 +55,8 @@ this.bulidScene = (scene) =>
     scene.meshList = [floor, doge, skyBox];
     scene.lightList = [light];
     scene.camera = simpleCamera;
-    scene.ambientColor = [0.1, 0.1, 0.11];
+    scene.ambientCubemap = tCubeMap;
+    scene.ambientColor = [0.1, 0.1, 0.1];
 }
 
 // 在运行前执行一次
@@ -76,5 +78,5 @@ this.customBeginPlay = () =>
 // 在运行时逐帧执行
 this.customTick = (deltaSecond) =>
 {
-    doge.addRotationOffset(new Vector3([0, 15, 0]).multiplyf(deltaSecond));
+    //doge.addRotationOffset(new Vector3([0, 15, 0]).multiplyf(deltaSecond));
 }

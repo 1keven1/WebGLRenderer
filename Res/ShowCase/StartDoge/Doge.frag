@@ -18,6 +18,7 @@ uniform mat4 u_Matrix_Light;
 
 uniform sampler2D u_ShadowMap;
 uniform vec4 u_ShadowMap_TexelSize;
+uniform samplerCube u_AmbientCubeMap;
 
 uniform vec3 u_AmbientColor;
 uniform sampler2D u_TexBC;
@@ -91,10 +92,16 @@ void main() {
     nDotH = smoothstep(0.8, 1.0, nDotH);
     vec3 specular = nDotH * u_LightColor.xyz * 0.1;
 
-    vec3 ambient = u_AmbientColor.xyz * albedo;
+    // 环境光
+    vec3 ambient = textureCube(u_AmbientCubeMap, worldNormal * vec3(-1), float(5)).xyz * 0.1;
 
+    // 阴影
     float shadow = getShadow();
 
+    // 最终
     vec3 finalColor = (diffuse + specular) * shadow + ambient;
+    //finalColor = finalColor / (finalColor + vec3(1.0));
+    //finalColor = pow(finalColor, vec3(1.0 / 2.2));
     gl_FragColor = vec4(finalColor, 1);
+    //gl_FragColor = textureCube(u_AmbientCubeMap, worldNormal * vec3(-1), float(5));
 }

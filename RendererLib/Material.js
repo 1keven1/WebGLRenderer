@@ -48,7 +48,7 @@ class Material {
      * @param {MATERIAL_TYPE} materialType 材质类型
      * @param {Number} queueOffset 渲染队列偏移
      */
-    constructor(baseShader = null, shadowCaster = null, materialType = MATERIAL_TYPE.OPAQUE, queueOffset = 0) {
+    constructor(baseShader, shadowCaster = null, materialType = MATERIAL_TYPE.OPAQUE, queueOffset = 0) {
         this.baseShader = baseShader;
         this.shadowCaster = shadowCaster;
         this.bBaseShaderLoaded = false;

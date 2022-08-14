@@ -21,6 +21,7 @@ class Texture
         this.texUnit = null;
 
         this.texture = null;
+        this.bLoaded = false;
     }
 
     load(texIndex)
@@ -78,6 +79,8 @@ class Texture
                         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
                     }
                     this.texture = texture;
+
+                    this.bLoaded = true;
                     this.loadOver();
                 };
                 image.src = this.texFile;
@@ -140,6 +143,8 @@ class Texture
                                 gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
                             }
                             this.texture = texture;
+
+                            this.bLoaded = true;
                             this.loadOver();
                         }
                     }
