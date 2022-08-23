@@ -18,7 +18,7 @@ uniform mat4 u_Matrix_Light;
 
 uniform sampler2D u_ShadowMap;
 uniform vec4 u_ShadowMap_TexelSize;
-
+uniform samplerCube u_AmbientCubeMap;
 uniform vec3 u_AmbientColor;
 
 varying vec2 v_TexCoord;
@@ -139,4 +139,6 @@ void main() {
     finalColor = pow(finalColor, vec3(1.0 / 2.2));
 
     gl_FragColor = vec4(finalColor, 1);
+
+    //gl_FragColor = textureCube(u_AmbientCubeMap, viewDir);
 }

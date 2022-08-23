@@ -37,6 +37,7 @@ void main() {
 
     float bias = float(1);
     vec3 albedo = textureCube(u_CubeMap, viewDir, bias).xyz;
+    //textureCubeLod(u_CubeMap, viewDir, float(1.2));
 
     vec3 finalColor = albedo;
     gl_FragColor = vec4(finalColor, 1);

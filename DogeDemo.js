@@ -35,6 +35,7 @@ let tFloorAO = new Texture('./Res/Material/Floor_AO.jpg', gl.TEXTURE_2D);
 let tDogeBC = new Texture('./Res/ShowCase/StartDoge/Doge_BC.jpg');
 let tDogeN = new Texture('./Res/ShowCase/StartDoge/Doge_N.jpg');
 let tCubeMap = new Texture('./Res/Cubemap/TestSky1', gl.TEXTURE_CUBE_MAP);
+let tNewCubeMap = new AmbientCubemap('./Res/Cubemap/TestSky1');
 
 // 想编辑的Shader列表
 this.codeEditor.editableShaderList = [
@@ -51,7 +52,7 @@ this.bulidScene = (scene) =>
 {
     scene.modelList = [smDoge, smPlane, smSkyBox];
     scene.materialList = [mDoge, mFloor, mSkyBox];
-    scene.textureList = [tFloorBC, tFloorN, tFloorR, tFloorAO, tDogeBC, tDogeN, tCubeMap];
+    scene.textureList = [tFloorBC, tFloorN, tFloorR, tFloorAO, tDogeBC, tDogeN, tCubeMap, tNewCubeMap];
     scene.meshList = [floor, doge, skyBox];
     scene.lightList = [light];
     scene.camera = simpleCamera;
@@ -70,7 +71,7 @@ this.customBeginPlay = () =>
     mDoge.setTexture('u_TexBC', tDogeBC);
     mDoge.setTexture('u_TexN', tDogeN);
 
-    mSkyBox.setTexture('u_CubeMap', tCubeMap)
+    mSkyBox.setTexture('u_CubeMap', tNewCubeMap)
 
     doge.setRotation(new Vector3([0, 0, 0]));
 }
