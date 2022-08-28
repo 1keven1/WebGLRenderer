@@ -35,8 +35,9 @@ void main() {
     bool twoSizeSign = dot(viewDir, worldNormal) > 0.0;
     worldNormal *= twoSizeSign ? 1.0 : -1.0;
 
+    vec3 R = reflect(viewDir, worldNormal);
     float bias = float(1);
-    vec3 albedo = textureCube(u_CubeMap, viewDir, bias).xyz;
+    vec3 albedo = textureCube(u_CubeMap, -viewDir, bias).xyz;
     //textureCubeLod(u_CubeMap, viewDir, float(1.2));
 
     vec3 finalColor = albedo;

@@ -1,6 +1,7 @@
-使用CubeMap表示全局光照
+解决irrandance map无法固定在某个mip层级的问题
+解决Cubemap的Mipmap有接缝的问题
+DogeDemo里的环境光问题
 贴图加载时的替代素材
-实现PBR
 Shader添加编译错误 编译中指示
 优化竖屏
 多光源
@@ -14,4 +15,6 @@ Shader添加编译错误 编译中指示
 不会的问题
 	代码编辑器的tab键咋整
 	选择可编辑着色器必须要bind
+	这PBR好丑哦
+	
 

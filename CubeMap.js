@@ -24,7 +24,7 @@ let smFloor = new Model('./Res/Model/Plane.obj', 1);
 let box = new Mesh(new Transform(new Vector3([0, 2, 0]), new Vector3([0, 0, 0]), new Vector3([2, 2, 2])), smQuad, mCubeMap, true);
 let floor = new Mesh(new Transform(), smFloor, mFloor, true);
 // 贴图
-let cubeMap = new Texture('./Res/Cubemap/TestSky1', gl.TEXTURE_CUBE_MAP);
+let tCubeMap = new Texture('./Res/Cubemap/TestSky1', gl.TEXTURE_CUBE_MAP);
 
 // 想编辑的Shader列表
 this.codeEditor.editableShaderList = [

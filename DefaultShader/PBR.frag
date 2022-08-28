@@ -21,6 +21,8 @@ uniform vec4 u_ShadowMap_TexelSize;
 uniform samplerCube u_AmbientCubeMap;
 uniform vec3 u_AmbientColor;
 
+uniform sampler2D u_BRDFLut;
+
 varying vec2 v_TexCoord;
 varying vec3 v_WorldNormal;
 varying vec3 v_WorldTangent;
@@ -79,6 +81,12 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
+// 考虑粗糙度的菲涅尔
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
+}
+
+
 // 几何函数 GGX与Schlick-Beckmann近似的结合体
 float GeometrySchlickGGX(float nDotV, float roughness) {
     float k = ((roughness + 1.0) * (roughness + 1.0)) / 8.0;
@@ -94,10 +102,11 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
     return ggx1 * ggx2;
 }
 
-vec3 albedo = vec3(1, 0, 0);
+vec3 albedo = vec3(1, 1, 1);
 float metallic = 0.0;
-float roughness = 0.3;
-
+float specular = 0.5;
+float roughness = 0.05;
+float ao = 0.99;
 // Main函数在这里
 void main() {
     vec3 worldNormal = normalize(v_WorldNormal);
@@ -121,24 +130,37 @@ void main() {
     // Cook-Torrance BRDF
     vec3 nominator = NDF * F * G;
     float denomiator = 4.0 * max(dot(worldNormal, viewDir), 0.0) * max(dot(worldNormal, lightDir), 0.0) + 0.0001;
-    vec3 specular = nominator / denomiator;
+    vec3 spec = nominator / denomiator;
 
     vec3 kS = F;
     vec3 kD = vec3(1.0) - kS;
     kD *= 1.0 - metallic;
-    vec3 lO = (kD * albedo / PI + specular) * u_LightColor.xyz * nDotL;
+    vec3 lO = (kD * albedo / PI + spec) * u_LightColor.xyz * nDotL;
 
-    // ambient
-    vec3 ambient = u_AmbientColor * albedo;
+    // ambient IBL
+    // 折射
+    kS = fresnelSchlickRoughness(max(dot(worldNormal, viewDir), 0.0), F0, roughness);
+    kD = vec3(1.0) - kS;
+    kD *= 1.0 - metallic;
+    vec3 irradiance = textureCube(u_AmbientCubeMap, worldNormal, float(4)).rgb;
+    vec3 diffuse = irradiance * albedo;
+    
+    //反射
+    vec3 reflectDir = reflect(-viewDir, worldNormal);
+    vec3 prefliteredColor = textureCube(u_AmbientCubeMap, reflectDir, roughness * float(5)).rgb;
+    vec2 envBRDF = texture2D(u_BRDFLut, vec2(max(dot(worldNormal, viewDir), 0.0), roughness)).rg;
+    vec3 indirectSpec = prefliteredColor * (kS * envBRDF.x + envBRDF.y);
+
+    vec3 ambient = (kD * diffuse + indirectSpec * specular) * ao;
 
     float shadow = getShadow();
 
     vec3 finalColor = lO + ambient;
+
     // 色调映射
     finalColor = finalColor / (finalColor + vec3(1.0));
+    // gamma矫正
     finalColor = pow(finalColor, vec3(1.0 / 2.2));
 
     gl_FragColor = vec4(finalColor, 1);
-
-    //gl_FragColor = textureCube(u_AmbientCubeMap, viewDir);
 }

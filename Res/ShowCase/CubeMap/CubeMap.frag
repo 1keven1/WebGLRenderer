@@ -72,7 +72,7 @@ void main() {
     bool twoSizeSign = dot(viewDir, worldNormal) > 0.0;
     worldNormal *= twoSizeSign ? 1.0 : -1.0;
 
-    vec3 albedo = textureCube(u_Cube, viewDir).xyz;
+    vec3 albedo = textureCube(u_Cube, -viewDir).xyz;
 
     vec3 finalColor = albedo;
     gl_FragColor = vec4(finalColor, 1);

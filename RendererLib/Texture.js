@@ -12,6 +12,8 @@ class Texture {
         this.texFormat = texFormat;
 
         this.bGenerateMipmap = true;
+        this.wrapModeS = gl.REPEAT;
+        this.wrapModeT = gl.REPEAT;
 
         this.width = -1;
         this.height = -1;
@@ -75,6 +77,9 @@ class Texture {
                         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
                         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
                     }
+                    // Wrap Mode
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, this.wrapModeS);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, this.wrapModeT);
                     this.texture = texture;
 
                     this.bLoaded = true;
@@ -111,7 +116,7 @@ class Texture {
                         // 如果都加载完了
                         if (images[0] && images[1] && images[2] && images[3] && images[4] && images[5]) {
                             // 写入图像数据
-                            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+                            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
                             gl.activeTexture(this.texUnit);
                             gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
 
@@ -139,6 +144,8 @@ class Texture {
                                 gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
                                 gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
                             }
+                            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, this.wrapModeS);
+                            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, this.wrapModeT);
                             this.texture = texture;
 
                             this.bLoaded = true;
@@ -155,11 +162,16 @@ class Texture {
     }
 
     loadOver() { }
+
+    setWrapMode(wrapMode){
+        this.wrapModeS = wrapMode;
+        this.wrapModeT = wrapMode;
+    }
 }
 
 class AmbientCubemap extends Texture {
     /**
-     * 供PBR使用的环境贴图
+     * 供PBR使用的环境贴图 Lod0-Lod6
      * @param {string} texFile 文件路径
      */
     constructor(texFile) {
@@ -201,7 +213,7 @@ class AmbientCubemap extends Texture {
                 // 如果都加载完了
                 if (images[0] && images[1] && images[2] && images[3] && images[4] && images[5]) {
                     // 写入图像数据
-                    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+                    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
                     gl.activeTexture(this.texUnit);
                     gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
 
@@ -227,7 +239,7 @@ class AmbientCubemap extends Texture {
                     this.texture = texture;
 
                     // 加载其他lod级别作为MipMap
-                    for (let i = 1; i < 6; i++) {
+                    for (let i = 1; i <= 6; i++) {
                         this.loadMip(i, paths, targets);
                     }
                 }
@@ -254,7 +266,7 @@ class AmbientCubemap extends Texture {
 
                 if (images[0] && images[1] && images[2] && images[3] && images[4] && images[5]){
                     // 写入图像数据
-                    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+                    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
                     gl.activeTexture(this.texUnit);
                     gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.texture);
 

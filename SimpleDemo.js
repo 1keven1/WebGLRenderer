@@ -6,7 +6,7 @@ simpleCamera.zoomSpeed = 1;
 // 光源
 let light = new Light(
     new Transform(new Vector3([0.0, 5.0, 0.0]), new Vector3([-45, 45, 0])), new Vector3([1.0, 1.0, 1.0]), 
-    10, 
+    1, 
     LIGHT_TYPE.DIRECTIONAL
     );
 // Shader

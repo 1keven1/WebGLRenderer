@@ -22,5 +22,11 @@
         "description": "测试一下CubeMap效果",
         "imageSrc": "./Res/ShowCase/CubeMap.jpg",
         "url": "./CubeMap.html"
+    },
+    {
+        "title": "PBR测试",
+        "description": "巨丑的PBR效果",
+        "imageSrc": "./Res/ShowCase/PBR.jpg",
+        "url": "./PBR.html"
     }
 ]

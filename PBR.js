@@ -24,6 +24,9 @@ let floor = new Mesh(new Transform(new Vector3([0, -1, 0])), smFloor, mFloor, fa
 let skyBox = new Mesh(new Transform(), smSkyBox, mSkyBox, false);
 // 贴图
 let tAmbientCubemap = new AmbientCubemap('./Res/Cubemap/TestSky1');
+let tBRDFLut = new Texture('./Res/PBR/BRDFLut.jpg');
+tBRDFLut.bGenerateMipmap = false;
+tBRDFLut.setWrapMode(gl.CLAMP_TO_EDGE);
 
 // 想编辑的Shader列表
 this.codeEditor.editableShaderList = [
@@ -38,8 +41,8 @@ this.bulidScene = (scene) =>
 {
     scene.modelList = [smSphere, smFloor, smSkyBox];
     scene.materialList = [mPBR, mFloor, mSkyBox];
-    scene.textureList = [tAmbientCubemap];
-    scene.meshList = [sphere, floor, skyBox];
+    scene.textureList = [tAmbientCubemap, tBRDFLut];
+    scene.meshList = [sphere, skyBox];
     scene.lightList = [sun];
     scene.camera = simpleCamera;
     scene.ambientCubemap = tAmbientCubemap;
@@ -50,6 +53,8 @@ this.bulidScene = (scene) =>
 this.customBeginPlay = () =>
 {
     mSkyBox.setTexture('u_CubeMap', tAmbientCubemap);
+
+    mPBR.setTexture('u_BRDFLut', tBRDFLut);
 }
 
 // 在运行时逐帧执行
