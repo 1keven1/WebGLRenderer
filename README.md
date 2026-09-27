@@ -4,9 +4,7 @@
 
 包含 OBJ 加载、基础光照、阴影、法线贴图、透明混合、天空盒和实验性 PBR，以及可编辑场景脚本和 Shader 的网页界面；数学与 WebGL 辅助函数来自 `cuon-*` / `webgl-*`，代码高亮使用 highlight.js。
 
-效果展示：https://1keven1.github.io/BlogSrc/WebGLRenderer/SimpleDemo.html
-
-<iframe src="https://1keven1.github.io/BlogSrc/WebGLRenderer/SimpleDemo.html" frameborder="0" width="100%" height="700" scrolling="no">浏览器不支持iframe</iframe>
+效果展示页面：https://1keven1.github.io/BlogSrc/WebGLRenderer/SimpleDemo.html
 
 ---
 
