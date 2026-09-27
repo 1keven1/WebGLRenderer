@@ -4,15 +4,21 @@
 
 包含 OBJ 加载、基础光照、阴影、法线贴图、透明混合、天空盒和实验性 PBR，以及可编辑场景脚本和 Shader 的网页界面；数学与 WebGL 辅助函数来自 `cuon-*` / `webgl-*`，代码高亮使用 highlight.js。
 
+效果展示：https://1keven1.github.io/BlogSrc/WebGLRenderer/SimpleDemo.html
+
+<iframe src="https://1keven1.github.io/BlogSrc/WebGLRenderer/SimpleDemo.html" frameborder="0" width="100%" height="700" scrolling="no">浏览器不支持iframe</iframe>
+
+---
+
 ## 运行与使用
 
-这是静态网页项目，无需构建。在项目根目录启动 HTTP 服务，例如已安装 `http-server` 时：
+这是静态网页项目，无需构建。本地则需在项目根目录启动 HTTP 服务，例如已安装 `http-server` 时：
 
 ```sh
 http-server . -p 8080 -c-1
 ```
 
-打开 [SimpleDemo](http://localhost:8080/SimpleDemo.html)。已有 HTTP 服务时直接使用其地址；模型、脚本和 Shader 通过 HTTP 加载，不要直接打开 HTML。
+不可直接打开 HTML运行。
 
 | 示例场景入口 | 内容 |
 | --- | --- |
