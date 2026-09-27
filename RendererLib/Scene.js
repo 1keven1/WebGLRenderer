@@ -23,7 +23,7 @@ class Scene {
 
         this.modelLoadedNum = 0;
         this.materialLoadedNum = 0;
-        this.textureLodedNum = 0;
+        this.textureLoadedNum = 0;
         this.lightLoadedNum = 0;
 
         this.loadTexture = null;
@@ -73,7 +73,7 @@ class Scene {
 
     textureLoadOver() {
         console.log('texture load over');
-        this.textureLodedNum++;
+        this.textureLoadedNum++;
         this.checkIfLoadOver();
     }
 
@@ -85,7 +85,7 @@ class Scene {
     checkIfLoadOver() {
         if (this.modelLoadedNum === this.modelList.length &&
             this.materialLoadedNum === this.materialList.length &&
-            this.textureLodedNum === this.textureList.length &&
+            this.textureLoadedNum === this.textureList.length &&
             this.lightLoadedNum === this.lightList.length) {
             // 做一些检查
             for (let i = 0; i < this.meshList.length; i++) {
@@ -159,14 +159,14 @@ class Scene {
     calculateMatrices() {
         // 计算Mesh的M矩阵
         this.meshList.forEach((mesh, index, arr) => {
-            mesh.bulidMMatrix();
+            mesh.buildMMatrix();
         })
         // 计算灯光VP矩阵
         this.lightList.forEach((light, index, arr) => {
-            light.bulidVPMatrix();
+            light.buildVPMatrix();
         })
         // 计算相机VP矩阵
-        this.camera.bulidVPMatrix();
+        this.camera.buildVPMatrix();
     }
 
     render(clearColor) {
@@ -317,7 +317,7 @@ class Scene {
 
         this.modelLoadedNum = 0;
         this.materialLoadedNum = 0;
-        this.textureLodedNum = 0;
+        this.textureLoadedNum = 0;
         this.lightLoadedNum = 0;
     }
 }

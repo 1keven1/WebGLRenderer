@@ -48,7 +48,7 @@ this.codeEditor.editableShaderList = [
 this.clearColor = [0.1, 0.1, 0.11, 1.0];
 
 // 传入所有需要初始化的资源
-this.bulidScene = (scene) =>
+this.buildScene = (scene) =>
 {
     scene.modelList = [smDoge, smPlane, smSkyBox];
     scene.materialList = [mDoge, mFloor, mSkyBox];

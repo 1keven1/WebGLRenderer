@@ -44,7 +44,7 @@ class WebGLRenderer {
 
         eval(this.customJS);
 
-        this.bulidScene(this.scene);
+        this.buildScene(this.scene);
         // 加载场景
         this.hud.changeLoadState(LOAD_STATE.LOADING);
         this.scene.loadOver = this.startRenderLoop.bind(this);
@@ -55,7 +55,7 @@ class WebGLRenderer {
      * 
      * @param {Scene} scene 
      */
-    bulidScene(scene) { }
+    buildScene(scene) { }
 
     startRenderLoop() {
         this.hud.changeLoadState(LOAD_STATE.FINISH);
@@ -220,19 +220,19 @@ class CodeEditor {
         this.sizePercent = 0.4;
 
         this.codeEditor = document.querySelector('.code-editor');
-        this.toogleCode = this.codeEditor.querySelector('.toggle-code');
+        this.toggleCode = this.codeEditor.querySelector('.toggle-code');
         this.tabContainer = this.codeEditor.querySelector('.tabs');
         this.panelContainer = this.codeEditor.querySelector('.panels');
         this.applyButton = this.codeEditor.querySelector('.apply-code');
         this.resizeHandler = this.codeEditor.querySelector('.resize-handler');
 
-        this.visability = false;
+        this.visibility = false;
         this.resizeHandler.holding = false;
-        this.resizeHandler.bActive = this.visability;
-        this.choise = -1;
+        this.resizeHandler.bActive = this.visibility;
+        this.selectedTabIndex = -1;
 
-        this.changeSize(this.visability ? window.innerWidth * this.sizePercent : 0, false);
-        this.multi = this.visability ? 1 : 0;
+        this.changeSize(this.visibility ? window.innerWidth * this.sizePercent : 0, false);
+        this.multi = this.visibility ? 1 : 0;
         this.goal = 0;
 
         this.implementEvents();
@@ -240,14 +240,14 @@ class CodeEditor {
 
     implementEvents() {
         // 切换代码显示
-        this.toogleCode.addEventListener('click', () => {
-            this.setVisabilityAnimate(!this.visability);
+        this.toggleCode.addEventListener('click', () => {
+            this.setVisibilityAnimate(!this.visibility);
         })
 
         // 确定按钮
         this.applyButton.addEventListener('click', () => {
-            let tab = this.tabs[this.choise];
-            let panel = this.panels[this.choise];
+            let tab = this.tabs[this.selectedTabIndex];
+            let panel = this.panels[this.selectedTabIndex];
 
             // 处理换行问题 给新生成的div添加换行符
             let divs = panel.querySelectorAll('div');
@@ -316,7 +316,7 @@ class CodeEditor {
 
         this.chooseTab(this.tabs[0]);
 
-        this.setVisability(this.visability);
+        this.setVisibility(this.visibility);
 
     }
 
@@ -329,7 +329,7 @@ class CodeEditor {
         })
         this.tabs = [];
         this.panels = [];
-        this.choise = -1;
+        this.selectedTabIndex = -1;
     }
 
     spawnTabs() {
@@ -369,17 +369,17 @@ class CodeEditor {
     }
 
     chooseTab(tab) {
-        if (tab.index === this.choise) return;
+        if (tab.index === this.selectedTabIndex) return;
 
         // 取消选择现在的标签
-        if (this.choise >= 0) {
-            this.panels[this.choise].classList.remove('enable');
-            this.tabs[this.choise].classList.remove('enable');
+        if (this.selectedTabIndex >= 0) {
+            this.panels[this.selectedTabIndex].classList.remove('enable');
+            this.tabs[this.selectedTabIndex].classList.remove('enable');
         }
         // 选择标签
         this.panels[tab.index].classList.add('enable');
         tab.classList.add('enable');
-        this.choise = tab.index;
+        this.selectedTabIndex = tab.index;
     }
 
     applyJSCode(code) {
@@ -401,7 +401,7 @@ class CodeEditor {
     }
 
     changeSize(w, clamp = true) {
-        // if (!this.visability) {
+        // if (!this.visibility) {
         //     this.codeEditor.style.width = 0 + 'px';
         //     height = canvas.clientHeight;
         //     width = canvas.clientWidth;
@@ -420,12 +420,12 @@ class CodeEditor {
         canvas.width = width;
     }
 
-    setVisability(visability) {
-        if (this.visability === visability) return;
-        this.visability = visability;
+    setVisibility(visibility) {
+        if (this.visibility === visibility) return;
+        this.visibility = visibility;
         this.resizeHandler.holding = false;
-        this.resizeHandler.bActive = visability;
-        if (visability) {
+        this.resizeHandler.bActive = visibility;
+        if (visibility) {
             this.changeSize(window.innerWidth * this.sizePercent);
         }
         else {
@@ -433,13 +433,13 @@ class CodeEditor {
         }
     }
 
-    setVisabilityAnimate(visability, animSpeed = 15) {
-        if (this.visability === visability) return;
-        this.visability = visability;
+    setVisibilityAnimate(visibility, animSpeed = 15) {
+        if (this.visibility === visibility) return;
+        this.visibility = visibility;
         this.resizeHandler.holding = false;
-        this.resizeHandler.bActive = visability;
+        this.resizeHandler.bActive = visibility;
 
-        this.goal = visability ? 1 : 0;
+        this.goal = visibility ? 1 : 0;
 
         if (this.multi !== 0 && this.multi !== 1) return;
 
@@ -475,13 +475,13 @@ class HUD {
     constructor(renderer) {
         this.renderer = renderer;
 
-        this.visability = true;
+        this.visibility = true;
         this.hud = document.querySelector('.hud');
 
         this.centerHud = this.hud.querySelector('.center-hud');
         this.centerHud.icon = this.centerHud.querySelector('.iconfont');
         this.centerHud.text = this.centerHud.querySelector('.text');
-        this.centerHud.visability = false;
+        this.centerHud.visibility = false;
 
         this.fpsDiv = this.hud.querySelector('.fps');
     }
@@ -489,10 +489,10 @@ class HUD {
     changeLoadState(loadState) {
         switch (loadState) {
             case LOAD_STATE.LOADING:
-                this.setCenterHubVisability(true);
+                this.setCenterHudVisibility(true);
                 break;
             case LOAD_STATE.FINISH:
-                this.setCenterHubVisability(false);
+                this.setCenterHudVisibility(false);
                 break;
             case LOAD_STATE.FAIL:
                 break;
@@ -501,15 +501,15 @@ class HUD {
         }
     }
 
-    setVisability(visability) {
-        if (this.visability === visability) return;
-        this.visability = visability;
+    setVisibility(visibility) {
+        if (this.visibility === visibility) return;
+        this.visibility = visibility;
     }
 
-    setCenterHubVisability(visability) {
-        if (this.centerHud.visability === visability) return;
-        this.centerHud.visability = visability;
-        this.centerHud.style.display = visability ? 'flex' : 'none';
+    setCenterHudVisibility(visibility) {
+        if (this.centerHud.visibility === visibility) return;
+        this.centerHud.visibility = visibility;
+        this.centerHud.style.display = visibility ? 'flex' : 'none';
     }
 
     update(deltaSecond){
@@ -527,7 +527,7 @@ class ShowCasesPanel{
         this.caseContainer = document.querySelector('.show-cases');
         this.togglePanel = document.querySelector('.toggle-panel');
 
-        this.visability = false;
+        this.visibility = false;
 
         this.implementEvents();
         this.initialize();
@@ -536,7 +536,7 @@ class ShowCasesPanel{
     initialize(){
         this.showPanel.style.transitionProperty = 'none';
 
-        this.showPanel.style.left = this.visability ? '0px' : '-400px';
+        this.showPanel.style.left = this.visibility ? '0px' : '-400px';
 
         // 读取JSON文件
         let jsonRequest = new XMLHttpRequest();
@@ -565,13 +565,13 @@ class ShowCasesPanel{
         // 显示和收起
         this.togglePanel.addEventListener('click', () => {
             this.showPanel.style.transitionProperty = 'left';
-            this.changeVisability(!this.visability);
+            this.changeVisibility(!this.visibility);
         })
     }
 
-    changeVisability(visability){
-        if(visability !== this.visability) this.visability = visability;
-        this.showPanel.style.left = visability ? '0px' : '-400px';
+    changeVisibility(visibility){
+        if(visibility !== this.visibility) this.visibility = visibility;
+        this.showPanel.style.left = visibility ? '0px' : '-400px';
     }
 
     /**

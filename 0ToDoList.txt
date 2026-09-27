@@ -1,4 +1,4 @@
-解决irrandance map无法固定在某个mip层级的问题
+解决irradiance map无法固定在某个mip层级的问题
 解决Cubemap的Mipmap有接缝的问题
 DogeDemo里的环境光问题
 贴图加载时的替代素材
@@ -10,6 +10,15 @@ Shader添加编译错误 编译中指示
 后期处理
 加载时显示在加载什么
 模型加载时的替代素材
+PCF采样的sum变量初始化为0
+PBR计算出的阴影应用到最终颜色
+绘制阴影和清屏前重置深度写入 混合等状态
+Shader编译失败时保留原来的效果
+资源加载失败时显示错误 避免一直加载中
+修正资源还没加载完就标记为已加载的问题
+修正AmbientCubemap漏检查最后一级Mip和重复通知加载完成的问题
+材质设置向量参数时检查是否有ShadowCaster
+把CodeEditor HUD ShowCasesPanel拆到单独文件
 
 ----------------------------------
 不会的问题

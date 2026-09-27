@@ -62,12 +62,12 @@ Vector3.prototype.addf = function (float) {
     return this;
 }
 
-Vector3.prototype.substract = function (vector3) {
+Vector3.prototype.subtract = function (vector3) {
     this.elements = [this.x() - vector3.x(), this.y() - vector3.y(), this.z() - vector3.z()];
     return this;
 }
 
-Vector3.prototype.substractf = function (float) {
+Vector3.prototype.subtractf = function (float) {
     this.elements = [this.x() - float, this.y() - float, this.z() - float];
     return this;
 }

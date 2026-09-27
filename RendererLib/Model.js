@@ -42,7 +42,7 @@ class Model {
         this.faces = new Array(0);
 
         this.vertexBuffer = null;
-        this.texcoordBuffer = null;
+        this.texCoordBuffer = null;
         this.normalBuffer = null;
         this.tangentBuffer = null;
         this.indexBuffer = null;

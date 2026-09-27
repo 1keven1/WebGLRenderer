@@ -68,7 +68,7 @@ float getShadow() {
 }
 
 // 法线分布函数 Trowbridge-Reitz GGX
-float DistrubutionGGX(vec3 N, vec3 H, float roughness) {
+float DistributionGGX(vec3 N, vec3 H, float roughness) {
     float a = roughness * roughness;
     float nDotH = max(dot(N, H), 0.0);
 
@@ -120,7 +120,7 @@ void main() {
     float nDotL = max(dot(worldNormal, lightDir), 0.0);
 
     // 法线分布
-    float NDF = DistrubutionGGX(worldNormal, halfVec, roughness);
+    float NDF = DistributionGGX(worldNormal, halfVec, roughness);
     // 菲涅尔项
     vec3 F0 = mix(vec3(0.04), albedo, metallic);
     vec3 F = fresnelSchlick(max(dot(halfVec, viewDir), 0.0), F0);
@@ -128,9 +128,9 @@ void main() {
     float G = GeometrySmith(worldNormal, viewDir, lightDir, roughness);
 
     // Cook-Torrance BRDF
-    vec3 nominator = NDF * F * G;
-    float denomiator = 4.0 * max(dot(worldNormal, viewDir), 0.0) * max(dot(worldNormal, lightDir), 0.0) + 0.0001;
-    vec3 spec = nominator / denomiator;
+    vec3 numerator = NDF * F * G;
+    float denominator = 4.0 * max(dot(worldNormal, viewDir), 0.0) * max(dot(worldNormal, lightDir), 0.0) + 0.0001;
+    vec3 spec = numerator / denominator;
 
     vec3 kS = F;
     vec3 kD = vec3(1.0) - kS;
@@ -147,9 +147,9 @@ void main() {
     
     //反射
     vec3 reflectDir = reflect(-viewDir, worldNormal);
-    vec3 prefliteredColor = textureCube(u_AmbientCubeMap, reflectDir, roughness * float(5)).rgb;
+    vec3 prefilteredColor = textureCube(u_AmbientCubeMap, reflectDir, roughness * float(5)).rgb;
     vec2 envBRDF = texture2D(u_BRDFLut, vec2(max(dot(worldNormal, viewDir), 0.0), roughness)).rg;
-    vec3 indirectSpec = prefliteredColor * (kS * envBRDF.x + envBRDF.y);
+    vec3 indirectSpec = prefilteredColor * (kS * envBRDF.x + envBRDF.y);
 
     vec3 ambient = (kD * diffuse + indirectSpec * specular) * ao;
 

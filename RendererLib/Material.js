@@ -1,4 +1,4 @@
-'use scrict';
+'use strict';
 
 /*
 渲染队列：
@@ -31,13 +31,13 @@ const CULL_MODE = {
 }
 Object.freeze(CULL_MODE);
 
-const ATTRIBURE_TYPE = {
+const ATTRIBUTE_TYPE = {
     SCALAR: Symbol(0),
     VECTOR3: Symbol(1),
     VECTOR4: Symbol(2),
     TEXTURE: Symbol(3),
 }
-Object.freeze(ATTRIBURE_TYPE);
+Object.freeze(ATTRIBUTE_TYPE);
 
 class Material {
     /**
@@ -213,7 +213,7 @@ class Material {
      * @param {Number} z z
      */
     setVector3f(param, x = 0.0, y = 0.0, z = 0.0) {
-        this.addAttribute(ATTRIBURE_TYPE.VECTOR3, param, [x, y, z]);
+        this.addAttribute(ATTRIBUTE_TYPE.VECTOR3, param, [x, y, z]);
 
         let bExist = false;
         gl.useProgram(this.getBaseProgram());
@@ -243,7 +243,7 @@ class Material {
      * @param {Number} w w
      */
     setVector4f(param, x = 0.0, y = 0.0, z = 0.0, w = 1.0) {
-        this.addAttribute(ATTRIBURE_TYPE.VECTOR4, param, [x, y, z, w]);
+        this.addAttribute(ATTRIBUTE_TYPE.VECTOR4, param, [x, y, z, w]);
 
         let bExist = false;
         gl.useProgram(this.getBaseProgram());
@@ -270,7 +270,7 @@ class Material {
      * @param {Texture} texture 贴图
      */
     setTexture(param, texture) {
-        this.addAttribute(ATTRIBURE_TYPE.TEXTURE, param, texture);
+        this.addAttribute(ATTRIBUTE_TYPE.TEXTURE, param, texture);
         let bExist = false;
 
         if(this.baseShader){
@@ -306,7 +306,7 @@ class Material {
 
     /**
      * 将参数储存到Material中
-     * @param {ATTRIBURE_TYPE} attributeType 参数类型
+     * @param {ATTRIBUTE_TYPE} attributeType 参数类型
      * @param {String} name 参数名称
      * @param {*} value 参数值
      */
@@ -337,15 +337,15 @@ class Material {
             }
             else {
                 switch (this.attributeList[i].type) {
-                    case ATTRIBURE_TYPE.SCALAR:
+                    case ATTRIBUTE_TYPE.SCALAR:
                         break;
-                    case ATTRIBURE_TYPE.VECTOR3:
+                    case ATTRIBUTE_TYPE.VECTOR3:
                         gl.uniform3fv(u_Param, this.attributeList[i].value);
                         break;
-                    case ATTRIBURE_TYPE.VECTOR4:
+                    case ATTRIBUTE_TYPE.VECTOR4:
                         gl.uniform4fv(u_Param, this.attributeList[i].value);
                         break;
-                    case ATTRIBURE_TYPE.TEXTURE:
+                    case ATTRIBUTE_TYPE.TEXTURE:
                         gl.uniform1i(u_Param, this.attributeList[i].value.texIndex);
                         break;
                     default:

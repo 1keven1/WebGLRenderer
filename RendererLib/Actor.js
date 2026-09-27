@@ -30,10 +30,10 @@ class Actor {
 
     update(deltaSecond) { }
 
-    updateMatrics() {
-        if (this.getRotation().x() > 360) this.transform.rotation.substract(new Vector3([360, 0, 0]));
-        if (this.getRotation().y() > 360) this.transform.rotation.substract(new Vector3([0, 360, 0]));
-        if (this.getRotation().z() > 360) this.transform.rotation.substract(new Vector3([0, 0, 360]));
+    updateMatrices() {
+        if (this.getRotation().x() > 360) this.transform.rotation.subtract(new Vector3([360, 0, 0]));
+        if (this.getRotation().y() > 360) this.transform.rotation.subtract(new Vector3([0, 360, 0]));
+        if (this.getRotation().z() > 360) this.transform.rotation.subtract(new Vector3([0, 0, 360]));
         if (this.getRotation().x() < 0) this.transform.rotation.add(new Vector3([360, 0, 0]));
         if (this.getRotation().y() < 0) this.transform.rotation.add(new Vector3([0, 360, 0]));
         if (this.getRotation().z() < 0) this.transform.rotation.add(new Vector3([0, 0, 360]));
@@ -156,7 +156,7 @@ class Actor {
      * @returns {Number} 距离
      */
     distanceToActor(actor){
-        return actor.getLocation().substract(this.getLocation()).getLength();
+        return actor.getLocation().subtract(this.getLocation()).getLength();
     }
 }
 
@@ -199,8 +199,8 @@ class Mesh extends Actor {
     /**
      * 构造M矩阵
      */
-    bulidMMatrix() {
-        this.updateMatrics();
+    buildMMatrix() {
+        this.updateMatrices();
 
         this.mMatrix.setTranslate(this.transform.location.x(), this.transform.location.y(), this.transform.location.z()).
             multiply(this.rotationMatrix).
@@ -234,8 +234,8 @@ class Light extends Actor {
         this.shadowMapRes = 2048;
     }
 
-    bulidVPMatrix() {
-        this.updateMatrics();
+    buildVPMatrix() {
+        this.updateMatrices();
         switch (this.lightType) {
             case LIGHT_TYPE.DIRECTIONAL:
                 let lookVec = this.getForwardVector();
@@ -336,8 +336,8 @@ class Camera extends Actor {
         this.vpMatrix = new Matrix4();
     }
 
-    bulidVPMatrix() {
-        this.updateMatrics();
+    buildVPMatrix() {
+        this.updateMatrices();
         let lookVec = this.rotationMatrix.multiplyVector3(new Vector3([0, 0, -1]));
         let upVec = this.rotationMatrix.multiplyVector3(new Vector3([0, 1, 0]));
 
@@ -429,15 +429,15 @@ class SimpleRotateCamera extends Camera {
     }
 
     // 重写updateMatrix
-    updateMatrics() {
+    updateMatrices() {
         if (this.yaw >= 360) this.yaw -= 360;
         if (this.yaw <= 0) this.yaw += 360;
 
         this.rotationMatrix.setRotate(this.yaw, 0, 1, 0).rotate(this.pitch * -1, 1, 0, 0);
     }
 
-    bulidVPMatrix() {
-        this.updateMatrics();
+    buildVPMatrix() {
+        this.updateMatrices();
         let backVec = this.getForwardVector().multiplyf(-1 * this.distance);
         let eyePoint = this.lookAtPoint.copy().add(backVec);
         this.setLocation(eyePoint);
